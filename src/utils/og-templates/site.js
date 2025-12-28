@@ -8,7 +8,7 @@ export default async () => {
       type: "div",
       props: {
         style: {
-          background: "#fefbfb",
+          background: "#fffae6",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -40,7 +40,7 @@ export default async () => {
             props: {
               style: {
                 border: "4px solid #000",
-                background: "#fefbfb",
+                background: "#fffae6",
                 borderRadius: "4px",
                 display: "flex",
                 justifyContent: "center",

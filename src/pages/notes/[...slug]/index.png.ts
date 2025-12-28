@@ -9,13 +9,13 @@ export async function getStaticPaths() {
     return [];
   }
 
-  const posts = await getCollection("blog").then(p =>
+  const notes = await getCollection("blog").then(p =>
     p.filter(({ data }) => !data.draft && !data.ogImage)
   );
 
-  return posts.map(post => ({
-    params: { slug: getPath(post.id, post.filePath, false) },
-    props: post,
+  return notes.map(note => ({
+    params: { slug: getPath(note.id, note.filePath, false) },
+    props: note,
   }));
 }
 

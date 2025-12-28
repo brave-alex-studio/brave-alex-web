@@ -62,15 +62,9 @@ html[data-theme="dark"] {
   @apply underline decoration-2 underline-offset-4;
 }
 
-/*.font-color-accent {
-  color: var(--accent);
+#about > h2 {
+  font-family: "Germania One";
 }
-
-.germania-one-regular {
-  font-family: "Germania One", system-ui;
-  font-weight: 400;
-  font-style: normal;
-}*/
 
 /* Source: https://piccalil.li/blog/a-more-modern-css-reset/ */
 /* Anything that has been anchored to should have extra scroll margin */
