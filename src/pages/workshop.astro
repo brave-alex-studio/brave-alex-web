@@ -1,0 +1,43 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Footer from "@/components/Footer.astro";
+import WorkCard from "@/components/WorkCard.astro";
+import getSortedWork from "@/utils/getSortedWork";
+
+const works = await getCollection("work");
+
+const sortedWorks = getSortedWork(works);
+---
+
+<Layout title="Workshop">
+  <Header />
+  <Breadcrumb />
+  <main id="main-content" data-layout="workshop">
+    <section
+      id="workshop"
+      class="app-prose mb-28 max-w-app text-lg prose-img:border-0"
+    >
+      <h1 class="germania-one-regular text-4xl tracking-wider sm:text-3xl">
+        Workshop
+      </h1>
+      <p class="text-lg">
+        All of the things I have made are collected on this page.
+      </p>
+      <div class="grid-cols-2 gap-8 sm:grid">
+        {
+          sortedWorks.length > 0 && (
+            <>
+              {sortedWorks.map(data => (
+                <WorkCard {...data} />
+              ))}
+            </>
+          )
+        }
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
