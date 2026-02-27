@@ -13,12 +13,15 @@ export interface Props {
 const { noMarginTop = false } = Astro.props;
 ---
 
-<footer class:list={["w-full", { "mt-auto": !noMarginTop }]}>
+<footer class:list={["app-layout", { "mt-auto": !noMarginTop }]}>
   <HrIcon noPadding />
   <div
-    class="flex flex-col items-center justify-between py-6 sm:flex-row-reverse sm:py-4"
+  class:list={[
+        "py-6 sm:py-4",
+        "flex flex-col items-center justify-between sm:flex-row-reverse",
+      ]}
   >
-    <Socials centered />
+    <Socials  />
     <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row">
       <span>{currentYear}</span>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>

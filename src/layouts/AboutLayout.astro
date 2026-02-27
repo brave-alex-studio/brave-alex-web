@@ -18,7 +18,7 @@ const { frontmatter } = Astro.props;
 <Layout title={`${frontmatter.title} | ${SITE.title}`}>
   <Header />
   <Breadcrumb />
-  <main id="main-content">
+  <main id="main-content" class="app-layout">
     <section
       id="about"
       class="app-prose mb-28 max-w-app text-lg prose-img:border-0"
