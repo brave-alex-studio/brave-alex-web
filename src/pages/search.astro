@@ -45,6 +45,7 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       // Init pagefind ui
       const search = new PagefindUI({
         element: "#pagefind-search",
+        autofocus: true,
         showSubResults: true,
         showImages: false,
         processTerm: function (term: string) {
@@ -119,6 +120,8 @@ const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
       color: var(--accent);
       outline-offset: 1px;
       outline-color: var(--accent);
+      text-decoration-style: dashed;
+      text-underline-offset: 4px;
     }
 
     .pagefind-ui__result-title a:focus-visible,
