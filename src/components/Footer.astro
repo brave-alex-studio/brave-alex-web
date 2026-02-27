@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from "astro/types";
 import HrIcon from "./HrIcon.astro";
 import Socials from "./Socials.astro";
 import IconHeart from "@/assets/icons/IconHeart.svg";
@@ -6,14 +7,14 @@ import IconVeggies from "@/assets/icons/IconVeggies.svg";
 
 const currentYear = new Date().getFullYear();
 
-export interface Props {
+type Props = {
   noMarginTop?: boolean;
-}
+} & HTMLAttributes<"footer">;
 
-const { noMarginTop = false } = Astro.props;
+const { noMarginTop = false, class: className, ...attrs } = Astro.props;
 ---
 
-<footer class:list={["app-layout", { "mt-auto": !noMarginTop }]}>
+<footer class:list={["app-layout", { "mt-auto": !noMarginTop }, className]} {...attrs}>
   <HrIcon noPadding />
   <div
   class:list={[
