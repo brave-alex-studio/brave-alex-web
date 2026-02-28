@@ -1,0 +1,477 @@
+---
+type Props = {
+  tableId?: string;
+  dice?: string;
+  mode?: "single" | "multi";
+  label?: string;
+  id?: string;
+  interactive?: boolean;
+};
+
+const {
+  tableId,
+  dice,
+  mode,
+  label = "Roll",
+  id,
+  interactive = false,
+} = Astro.props;
+
+// Pre-populate the picker from the dice prop (e.g. "2d6" → count=2, side="d6")
+const diceDefault = dice ?? "d20";
+const countMatch = diceDefault.match(/^(\d+)(d\d+)$/i);
+const defaultCount = countMatch ? parseInt(countMatch[1]) : 1;
+const defaultSide = countMatch ? countMatch[2] : diceDefault;
+const DICE_SIDES = [
+  "d4",
+  "d5",
+  "d6",
+  "d8",
+  "d10",
+  "d12",
+  "d20",
+  "d100",
+] as const;
+---
+
+<div
+  class="dice-roller"
+  id={id}
+  data-table-id={tableId ?? ""}
+  data-dice={dice ?? ""}
+  data-mode={mode ?? ""}
+>
+  <div class="roller-controls">
+    {
+      interactive && (
+        <div class="dice-picker">
+          <input
+            type="number"
+            class="dice-count-input"
+            min="1"
+            max="20"
+            value={defaultCount}
+            aria-label="Number of dice"
+          />
+          <select class="dice-type-select" aria-label="Die type">
+            {DICE_SIDES.map(d => (
+              <option value={d} selected={d === defaultSide}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </div>
+      )
+    }
+    <div class="die-faces-wrap" aria-live="polite" aria-label="Die results">
+    </div>
+    <button class="roll-button" type="button">{label}</button>
+  </div>
+  <div class="roller-results" hidden>
+    <p class="results-label">Result</p>
+    <ul class="results-list"></ul>
+  </div>
+</div>
+
+<style>
+  .dice-roller {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    background-color: color-mix(in srgb, var(--muted) 20%, var(--background));
+    margin-block: 1rem;
+  }
+
+  .roller-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+  }
+
+  .die-faces-wrap {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* :global because these elements are created dynamically in JS and
+     don't receive Astro's scoped data attribute */
+  :global(.die-face) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 2px solid var(--border);
+    border-radius: 0.4rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--foreground);
+    background-color: var(--muted);
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .roll-button {
+    padding: 0.45rem 1.1rem;
+    background-color: var(--accent);
+    color: var(--background);
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .roll-button:hover {
+    opacity: 0.85;
+  }
+
+  .roll-button:active {
+    opacity: 0.7;
+  }
+
+  .roll-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .roller-results {
+    border-top: 1px solid var(--muted);
+    padding-top: 0.625rem;
+  }
+
+  .results-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--foreground);
+    opacity: 0.6;
+    margin: 0 0 0.35rem;
+  }
+
+  .results-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .results-list li {
+    font-size: 0.9rem;
+    color: var(--foreground);
+  }
+
+  .results-list .roll-sub {
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+
+  .results-list .no-match {
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* Interactive picker */
+  .dice-picker {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .dice-count-input,
+  .dice-type-select {
+    height: 2.25rem;
+    box-sizing: border-box;
+    padding: 0 0.5rem;
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    line-height: 1;
+  }
+
+  .dice-count-input {
+    width: 3.5rem;
+    text-align: center;
+    /* Hide browser number spinners — they're clunky at this size */
+    -moz-appearance: textfield;
+  }
+
+  .dice-count-input::-webkit-outer-spin-button,
+  .dice-count-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  .dice-type-select {
+    cursor: pointer;
+  }
+
+  .dice-count-input:focus,
+  .dice-type-select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: transparent;
+  }
+
+  /* Shake animation */
+  @keyframes dice-shake {
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+    20% {
+      transform: rotate(-15deg) scale(1.15);
+    }
+    40% {
+      transform: rotate(12deg) scale(0.95);
+    }
+    60% {
+      transform: rotate(-8deg) scale(1.08);
+    }
+    80% {
+      transform: rotate(5deg) scale(0.98);
+    }
+  }
+
+  :global(.die-face.rolling) {
+    animation: dice-shake 0.4s ease-in-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.die-face.rolling) {
+      animation: none;
+    }
+  }
+
+  /*
+   * Attached mode: when the roller immediately follows a GeneratorTable wrapper,
+   * visually merge them into one box. Place <GeneratorTable> before <DiceRoller>
+   * in MDX to trigger this.
+   */
+  :global(.ttrpg-wrapper + .dice-roller) {
+    margin-block-start: 0;
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    background-color: var(--background);
+  }
+
+  :global(.ttrpg-wrapper:has(+ .dice-roller)) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+</style>
+
+<script>
+  import { DiceRoll } from "@dice-roller/rpg-dice-roller";
+
+  // Parse the leading count from expressions like "2d6" → 2, "d20" → 1
+  function parseDiceCount(diceStr: string): number {
+    const m = /^(\d+)d/i.exec(diceStr.trim());
+    return m ? parseInt(m[1], 10) : 1;
+  }
+
+  // Split "2d6" → { count: 2, sideStr: "d6" }, "d20" → { count: 1, sideStr: "d20" }
+  function splitDiceExpr(diceStr: string): { count: number; sideStr: string } {
+    const m = /^(\d+)(d.+)$/i.exec(diceStr.trim());
+    if (m) return { count: parseInt(m[1], 10), sideStr: m[2] };
+    return { count: 1, sideStr: diceStr };
+  }
+
+  function makeDieFace(): HTMLElement {
+    const el = document.createElement("span");
+    el.className = "die-face";
+    el.textContent = "?";
+    return el;
+  }
+
+  function animateDie(el: HTMLElement, result: number, delay = 0) {
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReduced) {
+      el.textContent = String(result);
+      return;
+    }
+    setTimeout(() => {
+      el.textContent = String(result);
+      el.classList.remove("rolling");
+      void el.offsetWidth;
+      el.classList.add("rolling");
+      el.addEventListener(
+        "animationend",
+        () => el.classList.remove("rolling"),
+        {
+          once: true,
+        }
+      );
+    }, delay);
+  }
+
+  function initRoller(container: HTMLElement) {
+    const tableId = container.dataset.tableId;
+    const ownDice = container.dataset.dice;
+    const ownMode = container.dataset.mode;
+
+    const rollBtn = container.querySelector<HTMLButtonElement>(".roll-button");
+    const facesWrap = container.querySelector<HTMLElement>(".die-faces-wrap");
+    const resultsEl = container.querySelector<HTMLElement>(".roller-results");
+    const resultsList = container.querySelector<HTMLElement>(".results-list");
+    const countInput =
+      container.querySelector<HTMLInputElement>(".dice-count-input");
+    const typeSelect =
+      container.querySelector<HTMLSelectElement>(".dice-type-select");
+
+    if (!rollBtn || !facesWrap || !resultsEl || !resultsList) return;
+
+    const table = tableId
+      ? (document.getElementById(tableId) as HTMLTableElement | null)
+      : null;
+
+    const baseDiceStr = ownDice || table?.dataset.dice || "d20";
+    const mode = (ownMode || table?.dataset.mode || "single") as
+      | "single"
+      | "multi";
+    const headers: string[] = table?.dataset.headers
+      ? JSON.parse(table.dataset.headers)
+      : [];
+
+    // Returns the current dice string — from picker if interactive, otherwise fixed
+    function getDiceStr(): string {
+      if (countInput && typeSelect) {
+        const count = Math.max(
+          1,
+          Math.min(20, parseInt(countInput.value, 10) || 1)
+        );
+        return count === 1 ? typeSelect.value : `${count}${typeSelect.value}`;
+      }
+      return baseDiceStr;
+    }
+
+    // Rebuild die face placeholders to match current count
+    function buildFaces(): void {
+      const str = getDiceStr();
+      const count =
+        mode === "multi" ? Math.max(headers.length, 1) : parseDiceCount(str);
+      facesWrap!.innerHTML = "";
+      for (let i = 0; i < count; i++) {
+        facesWrap!.appendChild(makeDieFace());
+      }
+    }
+
+    buildFaces();
+
+    // Rebuild faces live when picker changes
+    countInput?.addEventListener("input", buildFaces);
+    typeSelect?.addEventListener("change", buildFaces);
+
+    // Update button label for non-interactive rollers with a default label
+    if (rollBtn.textContent?.trim() === "Roll" && !countInput) {
+      const str = getDiceStr();
+      const count =
+        mode === "multi" ? Math.max(headers.length, 1) : parseDiceCount(str);
+      rollBtn.textContent = count > 1 ? `Roll ${count}${str}` : `Roll ${str}`;
+    }
+
+    rollBtn.addEventListener("click", () => {
+      // Clear previous highlights
+      table
+        ?.querySelectorAll("tr.is-active")
+        .forEach(tr => tr.classList.remove("is-active"));
+      table
+        ?.querySelectorAll("td.is-active-cell")
+        .forEach(td => td.classList.remove("is-active-cell"));
+
+      resultsList.innerHTML = "";
+
+      // Always read current values so interactive mode stays in sync
+      const currentDiceStr = getDiceStr();
+      const currentFaces = Array.from(
+        facesWrap!.querySelectorAll<HTMLElement>(".die-face")
+      );
+
+      if (mode === "single") {
+        const { count, sideStr } = splitDiceExpr(currentDiceStr);
+
+        // Roll each die individually so we can animate them separately
+        const individualRolls = Array.from(
+          { length: count },
+          () => new DiceRoll(sideStr)
+        );
+        const individualValues = individualRolls.map(r => r.total);
+        const total = individualValues.reduce((a, b) => a + b, 0);
+
+        individualValues.forEach((val, i) =>
+          animateDie(currentFaces[i], val, i * 60)
+        );
+
+        const matchingRow = table?.querySelector<HTMLTableRowElement>(
+          `tr[data-result="${total}"]`
+        );
+        matchingRow?.classList.add("is-active");
+        matchingRow?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+        const cells = matchingRow?.querySelectorAll("td") ?? [];
+        const items = headers.length
+          ? headers.map((h, i) => {
+              const val = cells[i + 1]?.textContent?.trim() ?? "—";
+              return `<li><strong>${h}:</strong> ${val}</li>`;
+            })
+          : count > 1
+            ? [
+                `<li>${individualValues.join(" + ")} = <strong>${total}</strong></li>`,
+              ]
+            : [`<li>Rolled: <strong>${total}</strong></li>`];
+
+        resultsList.innerHTML = items.join("");
+      } else {
+        // Multi: one independent roll per column, staggered animation
+        const rolls = headers.map(() => new DiceRoll(currentDiceStr));
+
+        rolls.forEach((roll, i) => {
+          animateDie(currentFaces[i], roll.total, i * 60);
+        });
+
+        const items = headers.map((h, i) => {
+          const result = rolls[i].total;
+          const row = table?.querySelector<HTMLTableRowElement>(
+            `tr[data-result="${result}"]`
+          );
+          // Highlight just the specific cell for this column (skip die col at index 0)
+          const cell = row?.querySelectorAll("td")[i + 1];
+          cell?.classList.add("is-active-cell");
+
+          const val = cell?.textContent?.trim();
+          const valueHtml = val
+            ? `${val} <span class="roll-sub">(rolled ${result})</span>`
+            : `<span class="no-match">No match for ${result}</span>`;
+          return `<li><strong>${h}:</strong> ${valueHtml}</li>`;
+        });
+
+        resultsList.innerHTML = items.join("");
+      }
+
+      resultsEl.removeAttribute("hidden");
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>(".dice-roller").forEach(initRoller);
+
+  document.addEventListener("astro:after-swap", () => {
+    document.querySelectorAll<HTMLElement>(".dice-roller").forEach(initRoller);
+  });
+</script>

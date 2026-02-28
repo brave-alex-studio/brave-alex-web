@@ -1,0 +1,167 @@
+---
+type Props = {
+  id?: string;
+  dice: string;
+  mode?: "single" | "multi";
+  headers: string[];
+  rows: (string | number)[][];
+  caption?: string;
+  pinFirstColumn?: boolean;
+};
+
+const {
+  id,
+  dice,
+  mode = "single",
+  headers,
+  rows,
+  caption,
+  pinFirstColumn = true,
+} = Astro.props;
+---
+
+<div class="ttrpg-wrapper" id={id ? `${id}-wrapper` : undefined}>
+  <table
+    class="ttrpg-table"
+    data-dice={dice}
+    data-mode={mode}
+    data-headers={JSON.stringify(headers)}
+    id={id}
+  >
+    {
+      caption && (
+        <caption class="my-2 text-sm text-foreground/70 italic">
+          {caption}
+        </caption>
+      )
+    }
+    <thead>
+      <tr>
+        <th class:list={["ttrpg-die-col", { "pinned-col": pinFirstColumn }]}>
+          {dice}
+        </th>
+        {headers.map(h => <th>{h}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map(row => {
+          const [result, ...values] = row;
+          return (
+            <tr data-result={String(result)}>
+              <td
+                class:list={["ttrpg-die-col", { "pinned-col": pinFirstColumn }]}
+              >
+                {result}
+              </td>
+              {values.map(v => (
+                <td>{v}</td>
+              ))}
+            </tr>
+          );
+        })
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .ttrpg-wrapper {
+    overflow-x: auto;
+    border: 2px solid var(--border);
+    border-radius: 0.375rem;
+  }
+
+  .ttrpg-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  /* Reset any borders prose styles inject on cells */
+  .ttrpg-table th,
+  .ttrpg-table td {
+    border: none;
+  }
+
+  .ttrpg-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--muted);
+    color: var(--foreground);
+    font-weight: 600;
+    padding: 0.625rem 0.875rem;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ttrpg-table tbody td {
+    padding: 0.5rem 0.875rem;
+    border-bottom: 1px solid var(--muted);
+    background-color: var(--background);
+    color: var(--foreground);
+    vertical-align: top;
+  }
+
+  .ttrpg-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .ttrpg-table tbody tr:nth-child(even) td {
+    background-color: color-mix(in srgb, var(--muted) 30%, var(--background));
+  }
+
+  .pinned-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    border-right: 1px solid var(--muted);
+  }
+
+  .ttrpg-table thead .pinned-col {
+    z-index: 3;
+    background-color: var(--muted);
+  }
+
+  .ttrpg-table tbody .pinned-col {
+    background-color: var(--background);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+
+  .ttrpg-table tbody tr:nth-child(even) .pinned-col {
+    background-color: color-mix(in srgb, var(--muted) 30%, var(--background));
+  }
+
+  .ttrpg-die-col {
+    min-width: 3.5rem;
+    text-align: center;
+  }
+
+  /* Active row highlight (set by DiceRoller) */
+  /* Uses tbody + nth-child to beat the alternating-row specificity */
+  .ttrpg-table tbody tr.is-active td,
+  .ttrpg-table tbody tr:nth-child(even).is-active td,
+  .ttrpg-table tbody tr.is-active .pinned-col,
+  .ttrpg-table tbody tr:nth-child(even).is-active .pinned-col {
+    background-color: var(--accent);
+    color: var(--background);
+  }
+
+  /* Individual cell highlight for multi-roll mode */
+  .ttrpg-table tbody td.is-active-cell,
+  .ttrpg-table tbody tr:nth-child(even) td.is-active-cell {
+    background-color: var(--accent);
+    color: var(--background);
+  }
+
+  /* Hover on non-active rows — skip cells that are already highlighted */
+  .ttrpg-table tbody tr:not(.is-active):hover td:not(.is-active-cell),
+  .ttrpg-table tbody tr:not(.is-active):hover .pinned-col:not(.is-active-cell) {
+    background-color: color-mix(in srgb, var(--accent) 12%, var(--background));
+  }
+</style>
