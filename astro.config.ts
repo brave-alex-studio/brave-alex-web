@@ -1,40 +1,40 @@
-import { defineConfig, envField } from "astro/config";
-import mdx from "@astrojs/mdx";
-import tailwindcss from "@tailwindcss/vite";
-import sitemap from "@astrojs/sitemap";
-import remarkToc from "remark-toc";
-import remarkCollapse from "remark-collapse";
+import { defineConfig, envField } from 'astro/config'
+import mdx from '@astrojs/mdx'
+import tailwindcss from '@tailwindcss/vite'
+import sitemap from '@astrojs/sitemap'
+import remarkToc from 'remark-toc'
+import remarkCollapse from 'remark-collapse'
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
-  transformerNotationWordHighlight,
-} from "@shikijs/transformers";
-import { transformerFileName } from "./src/utils/transformers/fileName";
-import { SITE } from "./src/config";
+  transformerNotationWordHighlight
+} from '@shikijs/transformers'
+import { transformerFileName } from './src/utils/transformers/fileName'
+import { SITE } from './src/config'
 
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,
   integrations: [
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      filter: (page) => SITE.showArchives || !page.endsWith('/archives')
     }),
-    mdx(),
+    mdx()
   ],
   markdown: {
-    remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }]],
+    remarkPlugins: [remarkToc, [remarkCollapse, { test: 'Table of contents' }]],
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
-      themes: { light: "min-light", dark: "night-owl" },
+      themes: { light: 'min-light', dark: 'night-owl' },
       defaultColor: false,
       wrap: false,
       transformers: [
-        transformerFileName({ style: "v2", hideDot: false }),
+        transformerFileName({ style: 'v2', hideDot: false }),
         transformerNotationHighlight(),
         transformerNotationWordHighlight(),
-        transformerNotationDiff({ matchAlgorithm: "v3" }),
-      ],
-    },
+        transformerNotationDiff({ matchAlgorithm: 'v3' })
+      ]
+    }
   },
   vite: {
     // eslint-disable-next-line
@@ -43,23 +43,21 @@ export default defineConfig({
     // See: https://github.com/withastro/astro/issues/14030
     plugins: [tailwindcss()],
     optimizeDeps: {
-      exclude: ["@resvg/resvg-js"],
-    },
+      exclude: ['@resvg/resvg-js']
+    }
   },
   image: {
     responsiveStyles: true,
-    layout: "constrained",
+    layout: 'constrained'
   },
   env: {
     schema: {
       PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
-        access: "public",
-        context: "client",
-        optional: true,
-      }),
-    },
+        access: 'public',
+        context: 'client',
+        optional: true
+      })
+    }
   },
-  experimental: {
-    preserveScriptOrder: true,
-  },
-});
+  experimental: {}
+})
