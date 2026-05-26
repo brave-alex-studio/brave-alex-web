@@ -4,15 +4,17 @@ import Main from "@/layouts/Main.astro";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import { SITE } from "@/config";
+import { getAssetPath } from "@/utils/withBase";
+import config from "@/config";
 
-const backUrl = SITE.showBackButton ? `${Astro.url.pathname}` : "/";
+const backUrl = config.features.showBackButton ? `${Astro.url.pathname}` : "/";
+const pagefindBundlePath = getAssetPath("pagefind/");
 ---
 
-<Layout title={`Search | ${SITE.title}`}>
+<Layout title={`Search | ${config.site.title}`}>
   <Header />
   <Main pageTitle="Search" pageDesc="Search any article ...">
-    <div id="pagefind-search" transition:persist data-backurl={backUrl}></div>
+    <div id="pagefind-search" transition:persist data-backurl={backUrl} data-bundle-path={pagefindBundlePath}></div>
   </Main>
   <Footer />
 </Layout>
