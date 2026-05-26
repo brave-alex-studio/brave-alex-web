@@ -1,4 +1,4 @@
-import { defineConfig, envField } from 'astro/config'
+import { defineConfig, envField, fontProviders, svgoOptimizer } from 'astro/config'
 import mdx from '@astrojs/mdx'
 import tailwindcss from '@tailwindcss/vite'
 import sitemap from '@astrojs/sitemap'
@@ -10,14 +10,13 @@ import {
   transformerNotationWordHighlight
 } from '@shikijs/transformers'
 import { transformerFileName } from './src/utils/transformers/fileName'
-import { SITE } from './src/config'
+import config from './astro-paper.config'
 
-// https://astro.build/config
 export default defineConfig({
-  site: SITE.website,
+  site: config.site.url,
   integrations: [
     sitemap({
-      filter: (page) => SITE.showArchives || !page.endsWith('/archives')
+      filter: (page) => config.features?.showArchives !== false || !page.endsWith("/archives/")
     }),
     mdx()
   ],
@@ -37,19 +36,41 @@ export default defineConfig({
     }
   },
   vite: {
-    // eslint-disable-next-line
-    // @ts-ignore
-    // This will be fixed in Astro 6 with Vite 7 support
-    // See: https://github.com/withastro/astro/issues/14030
     plugins: [tailwindcss()],
-    optimizeDeps: {
-      exclude: ['@resvg/resvg-js']
-    }
   },
   image: {
     responsiveStyles: true,
     layout: 'constrained'
   },
+  fonts: [
+    {
+         name: "Google Sans Code",
+         cssVariable: "--font-google-sans-code",
+         provider: fontProviders.google(),
+         fallbacks: ["monospace"],
+         weights: [300, 400, 500, 600, 700],
+         styles: ["normal", "italic"],
+         formats: ["woff", "ttf"],
+    },
+    {
+      name: "Germania One",
+      cssVariable: "--font-germania-one",
+      provider: fontProviders.google(),
+      fallbacks: ["sans"],
+      weights: [400, 700],
+      styles: ["normal"],
+      formats: ["woff", "ttf"],
+    },
+    {
+      name: "Open Sans",
+      cssVariable: "--font-open-sans",
+      provider: fontProviders.google(),
+      fallbacks: ["sans"],
+      weights: [400, 700],
+      styles: ["normal"],
+      formats: ["woff", "ttf"],
+    }
+  ],
   env: {
     schema: {
       PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
@@ -59,5 +80,7 @@ export default defineConfig({
       })
     }
   },
-  experimental: {}
+  experimental: {
+    svgOptimizer: svgoOptimizer(),
+  }
 })
