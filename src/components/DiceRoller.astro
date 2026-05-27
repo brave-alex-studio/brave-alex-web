@@ -1,45 +1,28 @@
 ---
 type Props = {
-  tableId?: string;
-  dice?: string;
-  mode?: "single" | "multi";
-  label?: string;
-  id?: string;
-  interactive?: boolean;
-};
+  tableId?: string
+  dice?: string
+  mode?: 'single' | 'multi'
+  label?: string
+  id?: string
+  interactive?: boolean
+}
 
-const {
-  tableId,
-  dice,
-  mode,
-  label = "Roll",
-  id,
-  interactive = false,
-} = Astro.props;
+const { tableId, dice, mode, label = 'Roll', id, interactive = false } = Astro.props
 
-// Pre-populate the picker from the dice prop (e.g. "2d6" → count=2, side="d6")
-const diceDefault = dice ?? "d20";
-const countMatch = diceDefault.match(/^(\d+)(d\d+)$/i);
-const defaultCount = countMatch ? parseInt(countMatch[1]) : 1;
-const defaultSide = countMatch ? countMatch[2] : diceDefault;
-const DICE_SIDES = [
-  "d4",
-  "d5",
-  "d6",
-  "d8",
-  "d10",
-  "d12",
-  "d20",
-  "d100",
-] as const;
+const diceDefault = dice ?? 'd20'
+const countMatch = diceDefault.match(/^(\d+)(d\d+)$/i)
+const defaultCount = countMatch ? parseInt(countMatch[1]) : 1
+const defaultSide = countMatch ? countMatch[2] : diceDefault
+const DICE_SIDES = ['d4', 'd5', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'] as const
 ---
 
 <div
   class="dice-roller"
   id={id}
-  data-table-id={tableId ?? ""}
-  data-dice={dice ?? ""}
-  data-mode={mode ?? ""}
+  data-table-id={tableId ?? ''}
+  data-dice={dice ?? ''}
+  data-mode={mode ?? ''}
 >
   <div class="roller-controls">
     {
@@ -54,7 +37,7 @@ const DICE_SIDES = [
             aria-label="Number of dice"
           />
           <select class="dice-type-select" aria-label="Die type">
-            {DICE_SIDES.map(d => (
+            {DICE_SIDES.map((d) => (
               <option value={d} selected={d === defaultSide}>
                 {d}
               </option>
@@ -63,8 +46,7 @@ const DICE_SIDES = [
         </div>
       )
     }
-    <div class="die-faces-wrap" aria-live="polite" aria-label="Die results">
-    </div>
+    <div class="die-faces-wrap" aria-live="polite" aria-label="Die results"></div>
     <button class="roll-button" type="button">{label}</button>
   </div>
   <div class="roller-results" hidden>
@@ -277,201 +259,151 @@ const DICE_SIDES = [
 </style>
 
 <script>
-  import { DiceRoll } from "@dice-roller/rpg-dice-roller";
+  import { roll } from '@randsum/roller'
 
   // Parse the leading count from expressions like "2d6" → 2, "d20" → 1
   function parseDiceCount(diceStr: string): number {
-    const m = /^(\d+)d/i.exec(diceStr.trim());
-    return m ? parseInt(m[1], 10) : 1;
+    const m = /^(\d+)d/i.exec(diceStr.trim())
+    return m ? parseInt(m[1], 10) : 1
   }
 
-  // Split "2d6" → { count: 2, sideStr: "d6" }, "d20" → { count: 1, sideStr: "d20" }
-  function splitDiceExpr(diceStr: string): { count: number; sideStr: string } {
-    const m = /^(\d+)(d.+)$/i.exec(diceStr.trim());
-    if (m) return { count: parseInt(m[1], 10), sideStr: m[2] };
-    return { count: 1, sideStr: diceStr };
+  // randsum requires a leading count — "d10" is invalid, "1d10" is valid
+  function toRollNotation(s: string): string {
+    return s.replace(/^d/i, '1d')
   }
 
   function makeDieFace(): HTMLElement {
-    const el = document.createElement("span");
-    el.className = "die-face";
-    el.textContent = "?";
-    return el;
+    const el = document.createElement('span')
+    el.className = 'die-face'
+    el.textContent = '?'
+    return el
   }
 
   function animateDie(el: HTMLElement, result: number, delay = 0) {
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReduced) {
-      el.textContent = String(result);
-      return;
+      el.textContent = String(result)
+      return
     }
     setTimeout(() => {
-      el.textContent = String(result);
-      el.classList.remove("rolling");
-      void el.offsetWidth;
-      el.classList.add("rolling");
-      el.addEventListener(
-        "animationend",
-        () => el.classList.remove("rolling"),
-        {
-          once: true,
-        }
-      );
-    }, delay);
+      el.textContent = String(result)
+      el.classList.remove('rolling')
+      void el.offsetWidth
+      el.classList.add('rolling')
+      el.addEventListener('animationend', () => el.classList.remove('rolling'), {
+        once: true
+      })
+    }, delay)
   }
 
   function initRoller(container: HTMLElement) {
-    const tableId = container.dataset.tableId;
-    const ownDice = container.dataset.dice;
-    const ownMode = container.dataset.mode;
+    const tableId = container.dataset.tableId
+    const ownDice = container.dataset.dice
+    const ownMode = container.dataset.mode
 
-    const rollBtn = container.querySelector<HTMLButtonElement>(".roll-button");
-    const facesWrap = container.querySelector<HTMLElement>(".die-faces-wrap");
-    const resultsEl = container.querySelector<HTMLElement>(".roller-results");
-    const resultsList = container.querySelector<HTMLElement>(".results-list");
-    const countInput =
-      container.querySelector<HTMLInputElement>(".dice-count-input");
-    const typeSelect =
-      container.querySelector<HTMLSelectElement>(".dice-type-select");
+    const rollButton = container.querySelector<HTMLButtonElement>('.roll-button')
+    const facesWrap = container.querySelector<HTMLElement>('.die-faces-wrap')
+    const resultsElement = container.querySelector<HTMLElement>('.roller-results')
+    const resultsList = container.querySelector<HTMLElement>('.results-list')
+    const countInput = container.querySelector<HTMLInputElement>('.dice-count-input')
+    const typeSelect = container.querySelector<HTMLSelectElement>('.dice-type-select')
 
-    if (!rollBtn || !facesWrap || !resultsEl || !resultsList) return;
+    if (!rollButton || !facesWrap || !resultsElement || !resultsList) return
 
-    const table = tableId
-      ? (document.getElementById(tableId) as HTMLTableElement | null)
-      : null;
+    const table = tableId ? (document.getElementById(tableId) as HTMLTableElement | null) : null
 
-    const baseDiceStr = ownDice || table?.dataset.dice || "d20";
-    const mode = (ownMode || table?.dataset.mode || "single") as
-      | "single"
-      | "multi";
-    const headers: string[] = table?.dataset.headers
-      ? JSON.parse(table.dataset.headers)
-      : [];
+    const baseDiceString = ownDice || table?.dataset.dice || 'd20'
+    const mode = (ownMode || table?.dataset.mode || 'single') as 'single' | 'multi'
+    const headers: string[] = table?.dataset.headers ? JSON.parse(table.dataset.headers) : []
 
-    // Returns the current dice string — from picker if interactive, otherwise fixed
-    function getDiceStr(): string {
+    function getDiceString(): string {
       if (countInput && typeSelect) {
-        const count = Math.max(
-          1,
-          Math.min(20, parseInt(countInput.value, 10) || 1)
-        );
-        return count === 1 ? typeSelect.value : `${count}${typeSelect.value}`;
+        const count = Math.max(1, Math.min(20, parseInt(countInput.value, 10) || 1))
+        return count === 1 ? typeSelect.value : `${count}${typeSelect.value}`
       }
-      return baseDiceStr;
+      return baseDiceString
     }
 
-    // Rebuild die face placeholders to match current count
     function buildFaces(): void {
-      const str = getDiceStr();
-      const count =
-        mode === "multi" ? Math.max(headers.length, 1) : parseDiceCount(str);
-      facesWrap!.innerHTML = "";
+      const diceString = getDiceString()
+      const count = mode === 'multi' ? Math.max(headers.length, 1) : parseDiceCount(diceString)
+      facesWrap!.innerHTML = ''
       for (let i = 0; i < count; i++) {
-        facesWrap!.appendChild(makeDieFace());
+        facesWrap!.appendChild(makeDieFace())
       }
     }
 
-    buildFaces();
+    buildFaces()
 
-    // Rebuild faces live when picker changes
-    countInput?.addEventListener("input", buildFaces);
-    typeSelect?.addEventListener("change", buildFaces);
+    countInput?.addEventListener('input', buildFaces)
+    typeSelect?.addEventListener('change', buildFaces)
 
-    // Update button label for non-interactive rollers with a default label
-    if (rollBtn.textContent?.trim() === "Roll" && !countInput) {
-      const str = getDiceStr();
-      const count =
-        mode === "multi" ? Math.max(headers.length, 1) : parseDiceCount(str);
-      rollBtn.textContent = count > 1 ? `Roll ${count}${str}` : `Roll ${str}`;
+    if (rollButton.textContent?.trim() === 'Roll' && !countInput) {
+      rollButton.textContent = `Roll ${getDiceString()}`
     }
 
-    rollBtn.addEventListener("click", () => {
-      // Clear previous highlights
+    rollButton.addEventListener('click', () => {
+      table?.querySelectorAll('tr.is-active').forEach((tr) => tr.classList.remove('is-active'))
       table
-        ?.querySelectorAll("tr.is-active")
-        .forEach(tr => tr.classList.remove("is-active"));
-      table
-        ?.querySelectorAll("td.is-active-cell")
-        .forEach(td => td.classList.remove("is-active-cell"));
+        ?.querySelectorAll('td.is-active-cell')
+        .forEach((td) => td.classList.remove('is-active-cell'))
 
-      resultsList.innerHTML = "";
+      resultsList.innerHTML = ''
 
-      // Always read current values so interactive mode stays in sync
-      const currentDiceStr = getDiceStr();
-      const currentFaces = Array.from(
-        facesWrap!.querySelectorAll<HTMLElement>(".die-face")
-      );
+      const currentDiceString = getDiceString()
+      const currentFaces = Array.from(facesWrap!.querySelectorAll<HTMLElement>('.die-face'))
 
-      if (mode === "single") {
-        const { count, sideStr } = splitDiceExpr(currentDiceStr);
+      if (mode === 'single') {
+        const { total, values: individualValues } = roll(toRollNotation(currentDiceString))
 
-        // Roll each die individually so we can animate them separately
-        const individualRolls = Array.from(
-          { length: count },
-          () => new DiceRoll(sideStr)
-        );
-        const individualValues = individualRolls.map(r => r.total);
-        const total = individualValues.reduce((a, b) => a + b, 0);
+        individualValues.forEach((val, i) => animateDie(currentFaces[i], val, i * 60))
 
-        individualValues.forEach((val, i) =>
-          animateDie(currentFaces[i], val, i * 60)
-        );
+        const matchingRow = table?.querySelector<HTMLTableRowElement>(`tr[data-result="${total}"]`)
+        matchingRow?.classList.add('is-active')
+        matchingRow?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 
-        const matchingRow = table?.querySelector<HTMLTableRowElement>(
-          `tr[data-result="${total}"]`
-        );
-        matchingRow?.classList.add("is-active");
-        matchingRow?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-
-        const cells = matchingRow?.querySelectorAll("td") ?? [];
+        const cells = matchingRow?.querySelectorAll('td') ?? []
         const items = headers.length
           ? headers.map((h, i) => {
-              const val = cells[i + 1]?.textContent?.trim() ?? "—";
-              return `<li><strong>${h}:</strong> ${val}</li>`;
+              const val = cells[i + 1]?.textContent?.trim() ?? '—'
+              return `<li><strong>${h}:</strong> ${val}</li>`
             })
-          : count > 1
-            ? [
-                `<li>${individualValues.join(" + ")} = <strong>${total}</strong></li>`,
-              ]
-            : [`<li>Rolled: <strong>${total}</strong></li>`];
+          : individualValues.length > 1
+            ? [`<li>${individualValues.join(' + ')} = <strong>${total}</strong></li>`]
+            : [`<li>Rolled: <strong>${total}</strong></li>`]
 
-        resultsList.innerHTML = items.join("");
+        resultsList.innerHTML = items.join('')
       } else {
-        // Multi: one independent roll per column, staggered animation
-        const rolls = headers.map(() => new DiceRoll(currentDiceStr));
+        const rollResults = headers.map(() => roll(toRollNotation(currentDiceString)))
 
-        rolls.forEach((roll, i) => {
-          animateDie(currentFaces[i], roll.total, i * 60);
-        });
+        rollResults.forEach((r, i) => {
+          animateDie(currentFaces[i], r.total, i * 60)
+        })
 
         const items = headers.map((h, i) => {
-          const result = rolls[i].total;
-          const row = table?.querySelector<HTMLTableRowElement>(
-            `tr[data-result="${result}"]`
-          );
+          const result = rollResults[i].total
+          const row = table?.querySelector<HTMLTableRowElement>(`tr[data-result="${result}"]`)
           // Highlight just the specific cell for this column (skip die col at index 0)
-          const cell = row?.querySelectorAll("td")[i + 1];
-          cell?.classList.add("is-active-cell");
+          const cell = row?.querySelectorAll('td')[i + 1]
+          cell?.classList.add('is-active-cell')
 
-          const val = cell?.textContent?.trim();
+          const val = cell?.textContent?.trim()
           const valueHtml = val
             ? `${val} <span class="roll-sub">(rolled ${result})</span>`
-            : `<span class="no-match">No match for ${result}</span>`;
-          return `<li><strong>${h}:</strong> ${valueHtml}</li>`;
-        });
+            : `<span class="no-match">No match for ${result}</span>`
+          return `<li><strong>${h}:</strong> ${valueHtml}</li>`
+        })
 
-        resultsList.innerHTML = items.join("");
+        resultsList.innerHTML = items.join('')
       }
 
-      resultsEl.removeAttribute("hidden");
-    });
+      resultsElement.removeAttribute('hidden')
+    })
   }
 
-  document.querySelectorAll<HTMLElement>(".dice-roller").forEach(initRoller);
+  document.querySelectorAll<HTMLElement>('.dice-roller').forEach(initRoller)
 
-  document.addEventListener("astro:after-swap", () => {
-    document.querySelectorAll<HTMLElement>(".dice-roller").forEach(initRoller);
-  });
+  document.addEventListener('astro:after-swap', () => {
+    document.querySelectorAll<HTMLElement>('.dice-roller').forEach(initRoller)
+  })
 </script>
