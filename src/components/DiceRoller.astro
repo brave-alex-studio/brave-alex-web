@@ -324,7 +324,7 @@ const DICE_SIDES = ['d4', 'd5', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'] as cons
 </style>
 
 <script>
-  import { roll } from '@randsum/roller'
+  import { roll, type DiceNotation } from '@randsum/roller'
 
   // Parse the leading count from expressions like "2d6" → 2, "d20" → 1
   function parseDiceCount(diceStr: string): number {
@@ -333,8 +333,8 @@ const DICE_SIDES = ['d4', 'd5', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'] as cons
   }
 
   // randsum requires a leading count — "d10" is invalid, "1d10" is valid
-  function toRollNotation(s: string): string {
-    return s.replace(/^d/i, '1d')
+  function toRollNotation(s: string): DiceNotation {
+    return s.replace(/^d/i, '1d') as DiceNotation
   }
 
   function makeDieFace(): HTMLElement {
@@ -422,7 +422,7 @@ const DICE_SIDES = ['d4', 'd5', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'] as cons
       if (mode === 'single') {
         const { total, values: individualValues } = roll(toRollNotation(currentDiceString))
 
-        individualValues.forEach((val, i) => animateDie(currentFaces[i], val, i * 60))
+        individualValues.forEach((val, i) => animateDie(currentFaces[i], Number(val), i * 60))
 
         const matchingRow = table?.querySelector<HTMLTableRowElement>(`tr[data-result="${total}"]`)
         matchingRow?.classList.add('is-active')
