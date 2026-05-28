@@ -1,0 +1,413 @@
+---
+import { getCollection } from 'astro:content'
+import { createNotesHeatmap, type HeatmapDay } from '@/utils/notesHeatmapUtils'
+
+type Props = {
+  weeks?: number
+  showLatest?: boolean
+  latestCount?: number
+  excludeDraft?: boolean
+  startDate?: Date | string | null
+}
+
+const {
+  weeks = 52,
+  showLatest = true,
+  latestCount = 1,
+  excludeDraft = true,
+  startDate
+} = Astro.props
+
+const MOBILE_WEEKS = 26
+
+const posts = await getCollection('blog', ({ data }) => !excludeDraft || !data.draft)
+const heatmap = createNotesHeatmap(posts, weeks, latestCount, startDate)
+const mobileDays = heatmap.days.slice(-(MOBILE_WEEKS * 7))
+
+const heatmapLabel = startDate
+  ? `Writing activity since ${heatmap.startDate}`
+  : `Recent ${heatmap.weeks} weeks writing activity`
+
+const formatDate = new Intl.DateTimeFormat('en', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric'
+})
+
+function getPostLabel(count: number) {
+  return `${count} ${count === 1 ? 'notes' : 'notes'}`
+}
+
+function getDayTitle(day: HeatmapDay) {
+  if (day.isFuture) return `${day.date}: upcoming`
+  const titleLines = day.posts.slice(0, 5).map((post) => `- ${post.title}`)
+  const overflowLine = day.posts.length > 5 ? ['...'] : []
+  return [`${day.date}: ${getPostLabel(day.count)}`, ...titleLines, ...overflowLine].join('\n')
+}
+
+const MONTH_NAMES = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec'
+]
+const SQRT3 = Math.sqrt(3)
+
+// Flat-top hex geometry: radius controls grid spacing, draw radius is slightly
+// smaller to leave a visible gap between adjacent hexes.
+const HEX_R = 8 // grid spacing radius
+const HEX_DR = 7.3 // visible polygon radius
+const COL_SPACING = HEX_R * 1.5 // horizontal distance between column centers
+const ROW_SPACING = HEX_R * SQRT3 // vertical distance between row centers
+const ODD_OFFSET = ROW_SPACING / 2 // odd columns drop down by half a row
+
+const PAD_X = HEX_DR + 2
+const PAD_Y = (HEX_DR * SQRT3) / 2 + 2
+const LABEL_H = 14 // space above hexes reserved for month labels
+const YEAR_W = 16 // left gutter for year label
+
+const startYear = heatmap.days[0]?.date.slice(0, 4) ?? ''
+const endYear = heatmap.days[heatmap.days.length - 1]?.date.slice(0, 4) ?? ''
+const yearLabel = startYear === endYear ? startYear : `${startYear}–${endYear.slice(2)}`
+
+function hexPts(cx: number, cy: number, r = HEX_DR): string {
+  return Array.from({ length: 6 }, (_, i) => {
+    const a = (Math.PI / 3) * i
+    return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`
+  }).join(' ')
+}
+
+function buildHexGrid(days: HeatmapDay[], numWeeks: number) {
+  function center(col: number, row: number) {
+    return {
+      cx: YEAR_W + PAD_X + col * COL_SPACING,
+      cy: LABEL_H + PAD_Y + row * ROW_SPACING + (col % 2 === 1 ? ODD_OFFSET : 0)
+    }
+  }
+
+  const svgW = YEAR_W + PAD_X + (numWeeks - 1) * COL_SPACING + HEX_DR + PAD_X
+  const svgH = LABEL_H + PAD_Y + 6 * ROW_SPACING + ODD_OFFSET + (HEX_DR * SQRT3) / 2 + PAD_Y
+
+  const cells = days.map((day, i) => {
+    const { cx, cy } = center(Math.floor(i / 7), i % 7)
+    return { day, pts: hexPts(cx, cy), title: getDayTitle(day), href: day.posts[0]?.href }
+  })
+
+  const mlabels: { label: string; x: number }[] = []
+  const seen = new Set<string>()
+  for (let i = 0; i < days.length; i += 7) {
+    const day = days[i]
+    if (!day) continue
+    const d = new Date(day.date + 'T00:00:00Z')
+    const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`
+    if (!seen.has(key)) {
+      seen.add(key)
+      mlabels.push({ label: MONTH_NAMES[d.getUTCMonth()], x: center(i / 7, 0).cx })
+    }
+  }
+
+  return { svgW, svgH, cells, mlabels }
+}
+
+const desktopHex = buildHexGrid(heatmap.days, heatmap.weeks)
+const mobileHex = buildHexGrid(mobileDays, MOBILE_WEEKS)
+const LEGEND_PTS = hexPts(0, 0, 5.5)
+---
+
+<article class="heatmap-card">
+  <!-- <p class="heatmap-title">My writing hexcrawl</p> -->
+
+  <!-- {
+    showLatest && heatmap.latestPosts.length > 0 && (
+      <aside class="latest-tip" aria-label="Latest published posts">
+        <strong>Latest</strong>
+        <div class="latest-list">
+          {heatmap.latestPosts.map((post) => (
+            <a class="latest-link" href={post.href} aria-label={`Open latest post: ${post.title}`}>
+              <em>{post.title}</em>
+              <time datetime={post.date.toISOString()}>{formatDate.format(post.date)}</time>
+              <span class="latest-icon" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          ))}
+        </div>
+      </aside>
+    )
+  } -->
+
+  {
+    [
+      { hex: desktopHex, cls: 'desktop-grid' },
+      { hex: mobileHex, cls: 'mobile-grid' }
+    ].map(({ hex, cls }) => (
+      <svg
+        viewBox={`0 0 ${hex.svgW.toFixed(1)} ${hex.svgH.toFixed(1)}`}
+        width="100%"
+        class={`hex-grid ${cls}`}
+        aria-label={heatmapLabel}
+        role="img"
+      >
+        <text
+          x={YEAR_W / 2}
+          y={hex.svgH / 2}
+          transform={`rotate(-90 ${YEAR_W / 2} ${(hex.svgH / 2).toFixed(1)})`}
+          class="hex-year"
+          text-anchor="middle"
+          dominant-baseline="middle"
+        >
+          {yearLabel}
+        </text>
+
+        {hex.mlabels.map(({ label, x }) => (
+          <text x={x} y={LABEL_H - 2} class="hex-month" text-anchor="start">
+            {label}
+          </text>
+        ))}
+
+        {hex.cells.map(({ day, pts, title, href }) => {
+          if (day.isFuture) return <polygon points={pts} class="hex-cell future-cell" />
+
+          return href ? (
+            <a href={href} aria-label={title}>
+              <title>{title}</title>
+              <polygon points={pts} class={`hex-cell level-${day.level}`} />
+            </a>
+          ) : (
+            <g aria-label={title}>
+              <title>{title}</title>
+              <polygon points={pts} class={`hex-cell level-${day.level}`} />
+            </g>
+          )
+        })}
+      </svg>
+    ))
+  }
+
+  <footer>
+    <span>Less</span>
+    {
+      [0, 1, 2, 3, 4].map((level) => (
+        <svg viewBox="-6 -5.2 12 10.4" width="11" height="9.5" aria-hidden="true">
+          <polygon points={LEGEND_PTS} class={`hex-cell level-${level}`} />
+        </svg>
+      ))
+    }
+    <span>More</span>
+  </footer>
+
+  <!-- <div class="stats-row">
+    <div class="stat-item">
+      <strong>{heatmap.totalPosts}</strong>
+      <span>Total posts</span>
+    </div>
+    <div class="stat-item">
+      <strong>{heatmap.activeDays}</strong>
+      <span>Active days</span>
+    </div>
+  </div> -->
+</article>
+
+<style>
+  .heatmap-card {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .stat-item {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .stat-item strong {
+    color: var(--foreground);
+    font-size: 1.12rem;
+    line-height: 1;
+  }
+
+  .stat-item span {
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .latest-tip {
+    display: grid;
+    gap: 6px;
+    padding: 10px 11px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--muted) 40%, transparent);
+  }
+
+  .latest-list {
+    display: grid;
+    gap: 4px;
+  }
+
+  .latest-link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content 24px;
+    align-items: center;
+    min-width: 0;
+    gap: 8px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .latest-tip strong {
+    color: var(--accent);
+    font-size: 0.7rem;
+    line-height: 1.15;
+  }
+
+  .latest-tip em {
+    overflow: hidden;
+    color: var(--foreground);
+    font-size: 0.8rem;
+    font-style: normal;
+    font-weight: 650;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .latest-tip time {
+    color: var(--muted-foreground);
+    font-size: 0.68rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .latest-icon {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 0.8rem;
+    transition:
+      background 180ms ease,
+      transform 180ms ease;
+  }
+
+  .latest-link:hover .latest-icon,
+  .latest-link:focus-visible .latest-icon {
+    background: color-mix(in srgb, var(--muted) 60%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .latest-link:focus-visible {
+    border-radius: 7px;
+    outline: 2px dashed var(--accent);
+    outline-offset: 3px;
+  }
+
+  .heatmap-title {
+    margin: 0;
+    color: var(--foreground);
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .hex-grid {
+    display: block;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .mobile-grid {
+    display: none;
+  }
+
+  .hex-cell {
+    fill: var(--muted);
+    stroke: color-mix(in srgb, var(--border) 45%, transparent);
+    stroke-width: 0.75;
+  }
+
+  .future-cell {
+    fill: transparent;
+    stroke: none;
+  }
+
+  .level-0 {
+    fill: var(--muted);
+  }
+  .level-1 {
+    fill: color-mix(in srgb, var(--accent) 35%, var(--muted));
+  }
+  .level-2 {
+    fill: color-mix(in srgb, var(--accent) 55%, var(--muted));
+  }
+  .level-3 {
+    fill: color-mix(in srgb, var(--accent) 75%, var(--muted));
+  }
+  .level-4 {
+    fill: var(--accent);
+  }
+
+  a:hover .hex-cell,
+  a:focus-visible .hex-cell {
+    stroke: var(--accent);
+    stroke-width: 1;
+  }
+
+  a:focus-visible {
+    outline: none;
+  }
+
+  .hex-year,
+  .hex-month {
+    fill: var(--muted-foreground);
+    font-size: 9px;
+    font-family: inherit;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+  }
+
+  footer svg {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 560px) {
+    .desktop-grid {
+      display: none;
+    }
+    .mobile-grid {
+      display: block;
+    }
+  }
+</style>
