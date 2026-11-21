@@ -30,7 +30,7 @@ export default defineAstroPaperConfig({
   socials: [
     { name: "github",   url: "https://github.com/brave-alex-studio" },
     { name: "itch",  url: "https://brave-alex.itch.io" },
-    { name: "mail",     url: "mailto:info@brave-alex.studi" },
+    { name: "mail",     url: "mailto:info@brave-alex.studio" },
   ],
   shareLinks: [
     { name: "whatsapp", url: "https://wa.me/?text=" },
