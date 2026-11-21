@@ -1,19 +1,34 @@
 ---
-import { getCollection } from 'astro:content'
+import { getCollection, type CollectionEntry } from 'astro:content'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import Main from '@/layouts/Main.astro'
 import Layout from '@/layouts/Layout.astro'
 import Header from '@/components/Header.astro'
 import Footer from '@/components/Footer.astro'
 import Card from '@/components/Card.astro'
 import { getPostsByGroupCondition } from './_utils/getPostsByGroupCondition'
+import { postFilter } from '@/utils/postFilter'
+import { resolveTimezone } from '@/utils/resolveTimezone'
 import config from '@/config'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 // Redirect to 404 page if `showArchives` config is false
 if (!config.features.showArchives) {
   return Astro.redirect('/404')
 }
 
-const posts = await getCollection('blog', ({ data }) => !data.draft)
+const posts = (await getCollection('blog')).filter(postFilter)
+
+// Group by the calendar day the post's byline shows (see Datetime.astro),
+// not by the build machine's local zone.
+const publishDate = (post: CollectionEntry<'blog'>) =>
+  dayjs(post.data.pubDatetime).tz(
+    resolveTimezone(post.data.timezone ?? config.site.timezone)
+  )
 
 const months = [
   'January',
@@ -35,14 +50,14 @@ const months = [
   <Header />
   <Main pageTitle="Archives" pageDesc="All the articles I've archived.">
     {
-      Object.entries(getPostsByGroupCondition(posts, (post) => post.data.pubDatetime.getFullYear()))
+      Object.entries(getPostsByGroupCondition(posts, (post) => publishDate(post).year()))
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, yearGroup]) => (
           <div>
             <span class="text-2xl font-bold">{year}</span>{" "}
             <sup class="text-sm">{yearGroup.length}</sup>
             {Object.entries(
-              getPostsByGroupCondition(yearGroup, (post) => post.data.pubDatetime.getMonth() + 1)
+              getPostsByGroupCondition(yearGroup, (post) => publishDate(post).month() + 1)
             )
               .sort(([monthA], [monthB]) => Number(monthB) - Number(monthA))
               .map(([month, monthGroup]) => (
