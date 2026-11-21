@@ -18,7 +18,7 @@ export default defineConfig({
   site: config.site.url,
   integrations: [
     sitemap({
-      filter: (page) => config.features?.showArchives !== false || !page.endsWith("/archives/")
+      filter: (page) => config.features?.showArchives !== false || !/\/archives\/?$/.test(page)
     }),
     mdx()
   ],
