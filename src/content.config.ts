@@ -22,7 +22,11 @@ const blog = defineCollection({
       description: z.string(),
       canonicalURL: z.string().optional(),
       hideEditPost: z.boolean().optional(),
-      timezone: z.string().optional()
+      // An empty value means "not set", so the site timezone applies.
+      timezone: z
+        .string()
+        .optional()
+        .transform(tz => tz || undefined)
     })
 })
 
