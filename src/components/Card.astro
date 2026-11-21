@@ -1,5 +1,5 @@
 ---
-import { slugifyStr } from '@/utils/slugify'
+import { toTransitionName } from '@/utils/toTransitionName'
 import type { CollectionEntry } from 'astro:content'
 import { getPath } from '@/utils/getPath'
 import Datetime from './Datetime.astro'
@@ -22,7 +22,7 @@ const { title, description, ...props } = data
       'focus-visible:no-underline focus-visible:underline-offset-0'
     ]}
   >
-    <Heading style={{ viewTransitionName: slugifyStr(title) }}>
+    <Heading style={{ viewTransitionName: toTransitionName(title) }}>
       {title}
     </Heading>
   </a>
