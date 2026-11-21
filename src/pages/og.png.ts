@@ -6,25 +6,27 @@ import { getFontPathByWeight } from "@/utils/getFontPathByWeight";
 import config from "@/config";
 
 export const GET: APIRoute = async context => {
-  const fonts = fontData["--font-google-sans-code"];
-  const regularFontPath = getFontPathByWeight(fonts, 400);
-  const boldFontPath = getFontPathByWeight(fonts, 700);
+  const openSans = fontData["--font-open-sans"];
+  const germaniaOne = fontData["--font-germania-one"];
+  const openSansRegularPath = getFontPathByWeight(openSans, 400);
+  const openSansBoldPath = getFontPathByWeight(openSans, 700);
+  const germaniaOnePath = getFontPathByWeight(germaniaOne, 400);
 
-  if (regularFontPath === undefined || boldFontPath === undefined) {
+  if (!openSansRegularPath || !openSansBoldPath || !germaniaOnePath) {
     throw new Error("Cannot find the font path.");
   }
 
-  const [regularData, boldData] = await Promise.all([
-    fetch(experimental_getFontFileURL(regularFontPath, context.url)).then(res =>
-      res.arrayBuffer()
-    ),
-    fetch(experimental_getFontFileURL(boldFontPath, context.url)).then(res =>
-      res.arrayBuffer()
-    ),
-  ]);
+  const [openSansRegular, openSansBold, germaniaOneData] = await Promise.all(
+    [openSansRegularPath, openSansBoldPath, germaniaOnePath].map(path =>
+      fetch(experimental_getFontFileURL(path, context.url)).then(res =>
+        res.arrayBuffer()
+      )
+    )
+  );
 
   const svg = await satori(
     {
+      key: null,
       type: "div",
       props: {
         style: {
@@ -34,7 +36,7 @@ export const GET: APIRoute = async context => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "Google Sans Code",
+          fontFamily: "Open Sans",
         },
         children: [
           {
@@ -44,6 +46,7 @@ export const GET: APIRoute = async context => {
                 position: "absolute",
                 top: "-1px",
                 right: "-1px",
+                boxSizing: "border-box",
                 border: "4px solid #000",
                 background: "#ecebeb",
                 opacity: "0.9",
@@ -60,6 +63,8 @@ export const GET: APIRoute = async context => {
             type: "div",
             props: {
               style: {
+                position: "relative",
+                boxSizing: "border-box",
                 border: "4px solid #000",
                 background: "#fefbfb",
                 borderRadius: "4px",
@@ -98,14 +103,20 @@ export const GET: APIRoute = async context => {
                           {
                             type: "p",
                             props: {
-                              style: { fontSize: 72, fontWeight: "bold" },
+                              style: {
+                                fontSize: 72,
+                                fontWeight: "bold",
+                                fontFamily: "Germania One",
+                                margin: "0 0 31px",
+                                width: "100%",
+                              },
                               children: config.site.title,
                             },
                           },
                           {
                             type: "p",
                             props: {
-                              style: { fontSize: 28 },
+                              style: { fontSize: 28, margin: 0, width: "100%" },
                               children: config.site.description,
                             },
                           },
@@ -144,30 +155,9 @@ export const GET: APIRoute = async context => {
       height: 630,
       embedFont: true,
       fonts: [
-        {
-          name: "Open Sans",
-          data: regularData,
-          weight: 400,
-          style: "normal",
-        },
-        {
-          name: "Open Sans",
-          data: boldData,
-          weight: 700,
-          style: "normal",
-        },
-        {
-          name: "Germania One",
-          data: regularData,
-          weight: 400,
-          style: "normal",
-        },
-        {
-          name: "Germania One",
-          data: boldData,
-          weight: 700,
-          style: "normal",
-        },
+        { name: "Open Sans", data: openSansRegular, weight: 400, style: "normal" },
+        { name: "Open Sans", data: openSansBold, weight: 700, style: "normal" },
+        { name: "Germania One", data: germaniaOneData, weight: 400, style: "normal" },
       ],
     }
   );
