@@ -1,29 +1,27 @@
-import { BLOG_PATH } from "@/content.config";
-import { slugifyStr } from "./slugify";
+import { BLOG_PATH } from '@/content.config'
+import { slugifyStr } from './slugify'
 
 function getPostPathSegments(filePath: string | undefined): string[] {
   return (
     filePath
-      ?.replace(BLOG_PATH, "")
-      .split("/")
-      .filter(path => path !== "")
-      .filter(path => !path.startsWith("_"))
+      ?.replace(BLOG_PATH, '')
+      .split('/')
+      .filter((path) => path !== '')
+      .filter((path) => !path.startsWith('_'))
       .slice(0, -1)
-      .map(segment => slugifyStr(segment)) ?? []
-  );
+      .map((segment) => slugifyStr(segment)) ?? []
+  )
 }
 
 function getIdSlug(id: string): string {
-  const postId = id.split("/");
-  return postId.length > 0 ? String(postId[postId.length - 1]) : id;
+  const postId = id.split('/')
+  return postId.length > 0 ? String(postId[postId.length - 1]) : id
 }
 
 function getPostSlugPath(id: string, filePath: string | undefined): string {
-  const pathSegments = getPostPathSegments(filePath);
-  const slug = getIdSlug(id);
-  return pathSegments.length > 0
-    ? [...pathSegments, slug].join("/")
-    : String(slug);
+  const pathSegments = getPostPathSegments(filePath)
+  const slug = getIdSlug(id)
+  return pathSegments.length > 0 ? [...pathSegments, slug].join('/') : String(slug)
 }
 
 /**
@@ -32,7 +30,7 @@ function getPostSlugPath(id: string, filePath: string | undefined): string {
  * e.g. `/examples/my-post`
  */
 export function getPostSlug(id: string, filePath: string | undefined): string {
-  return `/${getPostSlugPath(id, filePath)}`;
+  return `/${getPostSlugPath(id, filePath)}`
 }
 
 /**
@@ -40,5 +38,5 @@ export function getPostSlug(id: string, filePath: string | undefined): string {
  * e.g. `/notes/2026/my-post`
  */
 export function getPostUrl(id: string, filePath: string | undefined): string {
-  return `/notes/${getPostSlugPath(id, filePath)}`;
+  return `/notes/${getPostSlugPath(id, filePath)}`
 }

@@ -1,35 +1,32 @@
 ---
-import type { HTMLAttributes } from "astro/types";
-import HrIcon from "./HrIcon.astro";
-import Socials from "./Socials.astro";
-import IconHeart from "@/assets/icons/IconHeart.svg";
-import IconVeggies from "@/assets/icons/IconVeggies.svg";
+import type { HTMLAttributes } from 'astro/types'
+import HrIcon from './HrIcon.astro'
+import Socials from './Socials.astro'
+import IconHeart from '@/assets/icons/IconHeart.svg'
+import IconVeggies from '@/assets/icons/IconVeggies.svg'
 
-const currentYear = new Date().getFullYear();
+const currentYear = new Date().getFullYear()
 
 type Props = {
-  noMarginTop?: boolean;
-} & HTMLAttributes<"footer">;
+  noMarginTop?: boolean
+} & HTMLAttributes<'footer'>
 
-const { noMarginTop = false, class: className, ...attrs } = Astro.props;
+const { noMarginTop = false, class: className, ...attrs } = Astro.props
 ---
 
-<footer class:list={["app-layout", { "mt-auto": !noMarginTop }, className]} {...attrs}>
+<footer class:list={['app-layout', { 'mt-auto': !noMarginTop }, className]} {...attrs}>
   <HrIcon noPadding />
   <div
-  class:list={[
-        "py-6 sm:py-4",
-        "flex flex-col items-center justify-between sm:flex-row-reverse",
-      ]}
+    class:list={['py-6 sm:py-4', 'flex flex-col items-center justify-between sm:flex-row-reverse']}
   >
-    <Socials  />
+    <Socials />
     <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row">
       <span>{currentYear}</span>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <div class="flex flex-row items-center">
-        <span class="pr-1">Made with </span><IconHeart
-          class="font-color-accent"
-        /><span>, powered by </span><IconVeggies class="font-color-accent" />.
+        <span class="pr-1">Made with </span><IconHeart class="font-color-accent" /><span
+          >, powered by
+        </span><IconVeggies class="font-color-accent" />.
       </div>
     </div>
   </div>
