@@ -141,7 +141,9 @@ const ogImage = ogImageUrl ? new URL(ogImageUrl, Astro.url.origin).href : undefi
 
     <div class="sm:my-8 sm:flex sm:items-start sm:justify-between sm:gap-8">
       <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-0">
-        {tags.map((tag) => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
+        {tags.map((tag) => (
+          <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />
+        ))}
       </ul>
 
       <ShareLinks />

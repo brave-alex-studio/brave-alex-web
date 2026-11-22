@@ -28,36 +28,40 @@ const DICE_SIDES = ['d4', 'd5', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'] as cons
   data-mode={mode ?? ''}
 >
   <div class="roller-controls">
-    {
-      interactive && (
-        <div class="dice-picker">
-          <input
-            type="number"
-            class="dice-count-input"
-            min="1"
-            max="20"
-            value={defaultCount}
-            aria-label="Number of dice"
-          />
-          <select class="dice-type-select" aria-label="Die type">
-            {DICE_SIDES.map((d) => (
-              <option value={d} selected={d === defaultSide}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-      )
-    }
+    {interactive && (
+      <div class="dice-picker">
+        <input
+          type="number"
+          class="dice-count-input"
+          min="1"
+          max="20"
+          value={defaultCount}
+          aria-label="Number of dice"
+        />
+        <select class="dice-type-select" aria-label="Die type">
+          {DICE_SIDES.map((d) => (
+            <option value={d} selected={d === defaultSide}>
+              {d}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
     <div class="die-faces-wrap" aria-live="polite" aria-label="Die results"></div>
-    <button class="roll-button" type="button">{label}</button>
+    <button class="roll-button" type="button">
+      {label}
+    </button>
   </div>
   <div class="roller-results" hidden>
     <div class="results-header">
       <p class="results-label">Result</p>
       <button class="copy-button" type="button" aria-label="Copy results to clipboard">
-        <span class="icon-copy" aria-hidden="true"><IconClipboard /></span>
-        <span class="icon-check" aria-hidden="true"><IconCheck /></span>
+        <span class="icon-copy" aria-hidden="true">
+          <IconClipboard />
+        </span>
+        <span class="icon-check" aria-hidden="true">
+          <IconCheck />
+        </span>
       </button>
     </div>
     <ul class="results-list"></ul>

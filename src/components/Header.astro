@@ -69,37 +69,47 @@ const isActive = (path: string) => {
         ]}
       >
         <li class="col-span-2">
-          <a href="/workshop" class:list={{ 'active-nav': isActive('/workshop') }}> Workshop </a>
+          <a href="/workshop" class:list={{ 'active-nav': isActive('/workshop') }}>
+            {' '}
+            Workshop{' '}
+          </a>
         </li>
         <li class="col-span-2">
-          <a href="/notes" class:list={{ 'active-nav': isActive('/notes') }}> Notebook </a>
+          <a href="/notes" class:list={{ 'active-nav': isActive('/notes') }}>
+            {' '}
+            Notebook{' '}
+          </a>
         </li>
         <li class="col-span-2">
-          <a href="/tags" class:list={{ 'active-nav': isActive('/tags') }}> Tags </a>
+          <a href="/tags" class:list={{ 'active-nav': isActive('/tags') }}>
+            {' '}
+            Tags{' '}
+          </a>
         </li>
         <li class="col-span-2">
-          <a href="/about" class:list={{ 'active-nav': isActive('/about') }}> About </a>
+          <a href="/about" class:list={{ 'active-nav': isActive('/about') }}>
+            {' '}
+            About{' '}
+          </a>
         </li>
-        {
-          features.showArchives && (
-            <li class="col-span-2">
-              <LinkButton
-                href="/archives"
-                class:list={[
-                  'focus-outline flex justify-center p-3 sm:p-1',
-                  {
-                    'active-nav [&>svg]:stroke-accent': isActive('/archives')
-                  }
-                ]}
-                aria-label="archives"
-                title="Archives"
-              >
-                <IconArchive class="hidden sm:inline-block" />
-                <span class="sm:sr-only">Archives</span>
-              </LinkButton>
-            </li>
-          )
-        }
+        {features.showArchives && (
+          <li class="col-span-2">
+            <LinkButton
+              href="/archives"
+              class:list={[
+                'focus-outline flex justify-center p-3 sm:p-1',
+                {
+                  'active-nav [&>svg]:stroke-accent': isActive('/archives')
+                }
+              ]}
+              aria-label="archives"
+              title="Archives"
+            >
+              <IconArchive class="hidden sm:inline-block" />
+              <span class="sm:sr-only">Archives</span>
+            </LinkButton>
+          </li>
+        )}
         <li class="col-span-1 flex items-center justify-center">
           <LinkButton
             href="/search"
@@ -114,22 +124,20 @@ const isActive = (path: string) => {
             <span class="sr-only">Search</span>
           </LinkButton>
         </li>
-        {
-          features.lightAndDarkMode && (
-            <li class="col-span-1 flex items-center justify-center">
-              <button
-                id="theme-btn"
-                class="focus-outline relative size-12 p-4 sm:size-8 hover:[&>svg]:stroke-accent"
-                title="Toggles light & dark"
-                aria-label="auto"
-                aria-live="polite"
-              >
-                <IconMoon class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                <IconSunHigh class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-              </button>
-            </li>
-          )
-        }
+        {features.lightAndDarkMode && (
+          <li class="col-span-1 flex items-center justify-center">
+            <button
+              id="theme-btn"
+              class="focus-outline relative size-12 p-4 sm:size-8 hover:[&>svg]:stroke-accent"
+              title="Toggles light & dark"
+              aria-label="auto"
+              aria-live="polite"
+            >
+              <IconMoon class="absolute top-[50%] left-[50%] -translate-[50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+              <IconSunHigh class="absolute top-[50%] left-[50%] -translate-[50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+            </button>
+          </li>
+        )}
       </ul>
     </nav>
   </div>

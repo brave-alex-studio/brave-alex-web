@@ -90,11 +90,9 @@ const rssHref = 'rss.xml'
     <!-- Extra head content injected by child layouts (e.g. JSON-LD, article meta) -->
     <slot name="head" />
 
-    {
-      site.googleVerification && (
-        <meta name="google-site-verification" content={site.googleVerification} />
-      )
-    }
+    {site.googleVerification && (
+      <meta name="google-site-verification" content={site.googleVerification} />
+    )}
     <!--
                 Inline FOUC-prevention script: sets data-theme on <html> before
                 the browser paints. Runs synchronously, no defer/async.
@@ -115,9 +113,7 @@ const rssHref = 'rss.xml'
 
     <CustomHead {title} {description} />
   </head>
-  <body
-    class="font-app flex min-h-svh flex-col bg-background text-foreground selection:bg-accent/75 selection:text-accent-foreground"
-  >
+  <body class="font-app flex min-h-svh flex-col bg-background text-foreground selection:bg-accent/75 selection:text-accent-foreground">
     <slot />
     <!-- Load full theme logic -->
     <script>

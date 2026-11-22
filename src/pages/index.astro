@@ -24,9 +24,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured)
   <Header />
   <main id="main-content" data-layout="index" class="app-layout my-1">
     <section id="hero" class:list={['pt-8 pb-6', 'border-b border-border']}>
-      <h1
-        class="my-4 inline-block [font-family:var(--font-germania-one)] text-4xl font-bold sm:my-8 sm:text-5xl"
-      >
+      <h1 class="my-4 inline-block [font-family:var(--font-germania-one)] text-4xl font-bold sm:my-8 sm:text-5xl">
         Brave Alex Studio
       </h1>{' '}
       <a
@@ -39,7 +37,6 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured)
         <IconRss width={20} height={20} class="scale-125 stroke-accent stroke-3 rtl:-rotate-90" />
         <span class="sr-only">RSS Feed</span>
       </a>
-
       <p class="text-lg">
         Hi, I'm Danielle. I make games, tools, and other curiosities for TTRPGs. And I occasionally
         write things here.
@@ -56,38 +53,34 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured)
       <NoteHeatmap />
     </section>
 
-    {
-      featuredPosts.length > 0 && (
-        <section
-          id="featured"
-          class:list={['pt-12 pb-6', { 'border-b border-border': recentPosts.length > 0 }]}
-        >
-          <h2 class="[font-family:var(--font-germania-one)] text-3xl font-semibold tracking-wide">
-            Featured
-          </h2>
-          <ul>
-            {featuredPosts.map((data) => (
-              <Card variant="h3" {...data} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
+    {featuredPosts.length > 0 && (
+      <section
+        id="featured"
+        class:list={['pt-12 pb-6', { 'border-b border-border': recentPosts.length > 0 }]}
+      >
+        <h2 class="[font-family:var(--font-germania-one)] text-3xl font-semibold tracking-wide">
+          Featured
+        </h2>
+        <ul>
+          {featuredPosts.map((data) => (
+            <Card variant="h3" {...data} />
+          ))}
+        </ul>
+      </section>
+    )}
 
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="[font-family:var(--font-germania-one)] text-3xl font-semibold tracking-wide">
-            Recent Notes
-          </h2>
-          <ul>
-            {recentPosts.slice(0, postsConfig.perIndex).map((data) => (
-              <Card variant="h3" {...data} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
+    {recentPosts.length > 0 && (
+      <section id="recent-posts" class="pt-12 pb-6">
+        <h2 class="[font-family:var(--font-germania-one)] text-3xl font-semibold tracking-wide">
+          Recent Notes
+        </h2>
+        <ul>
+          {recentPosts.slice(0, postsConfig.perIndex).map((data) => (
+            <Card variant="h3" {...data} />
+          ))}
+        </ul>
+      </section>
+    )}
 
     <div class="my-8 text-center">
       <LinkButton href="/notes/">
