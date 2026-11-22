@@ -1,7 +1,7 @@
-import kebabcase from "lodash.kebabcase";
-import slugify from "slugify";
+import kebabcase from 'lodash.kebabcase'
+import slugify from 'slugify'
 
-const hasNonLatin = (str: string): boolean => /[^\x00-\x7F]/.test(str);
+const hasNonLatin = (str: string): boolean => /[^\x00-\x7F]/.test(str)
 
 /**
  * Slugify a string using a hybrid approach:
@@ -10,9 +10,9 @@ const hasNonLatin = (str: string): boolean => /[^\x00-\x7F]/.test(str);
  */
 export const slugifyStr = (str: string): string => {
   if (hasNonLatin(str)) {
-    return kebabcase(str);
+    return kebabcase(str)
   }
-  return slugify(str, { lower: true });
-};
+  return slugify(str, { lower: true })
+}
 
-export const slugifyAll = (arr: string[]) => arr.map(str => slugifyStr(str));
+export const slugifyAll = (arr: string[]) => arr.map((str) => slugifyStr(str))

@@ -26,9 +26,7 @@ const posts = (await getCollection('blog')).filter(postFilter)
 // Group by the calendar day the post's byline shows (see Datetime.astro),
 // not by the build machine's local zone.
 const publishDate = (post: CollectionEntry<'blog'>) =>
-  dayjs(post.data.pubDatetime).tz(
-    resolveTimezone(post.data.timezone ?? config.site.timezone)
-  )
+  dayjs(post.data.pubDatetime).tz(resolveTimezone(post.data.timezone ?? config.site.timezone))
 
 const months = [
   'January',
@@ -54,7 +52,7 @@ const months = [
         .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
         .map(([year, yearGroup]) => (
           <div>
-            <span class="text-2xl font-bold">{year}</span>{" "}
+            <span class="text-2xl font-bold">{year}</span>{' '}
             <sup class="text-sm">{yearGroup.length}</sup>
             {Object.entries(
               getPostsByGroupCondition(yearGroup, (post) => publishDate(post).month() + 1)
@@ -63,7 +61,7 @@ const months = [
               .map(([month, monthGroup]) => (
                 <div class="flex flex-col sm:flex-row">
                   <div class="mt-6 min-w-36 text-lg sm:my-6">
-                    <span class="font-bold">{months[Number(month) - 1]}</span>{" "}
+                    <span class="font-bold">{months[Number(month) - 1]}</span>{' '}
                     <sup class="text-xs">{monthGroup.length}</sup>
                   </div>
                   <ul>

@@ -41,7 +41,7 @@ export default defineConfig({
     }
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss()]
   },
   image: {
     responsiveStyles: true,
@@ -49,31 +49,31 @@ export default defineConfig({
   },
   fonts: [
     {
-         name: "Google Sans Code",
-         cssVariable: "--font-google-sans-code",
-         provider: fontProviders.google(),
-         fallbacks: ["monospace"],
-         weights: [300, 400, 500, 600, 700],
-         styles: ["normal", "italic"],
-         formats: ["woff", "ttf"],
+      name: 'Google Sans Code',
+      cssVariable: '--font-google-sans-code',
+      provider: fontProviders.google(),
+      fallbacks: ['monospace'],
+      weights: [300, 400, 500, 600, 700],
+      styles: ['normal', 'italic'],
+      formats: ['woff', 'ttf']
     },
     {
-      name: "Germania One",
-      cssVariable: "--font-germania-one",
+      name: 'Germania One',
+      cssVariable: '--font-germania-one',
       provider: fontProviders.google(),
-      fallbacks: ["sans"],
+      fallbacks: ['sans'],
       weights: [400, 700],
-      styles: ["normal"],
-      formats: ["woff", "ttf"],
+      styles: ['normal'],
+      formats: ['woff', 'ttf']
     },
     {
-      name: "Open Sans",
-      cssVariable: "--font-open-sans",
+      name: 'Open Sans',
+      cssVariable: '--font-open-sans',
       provider: fontProviders.google(),
-      fallbacks: ["sans"],
+      fallbacks: ['sans'],
       weights: [400, 700],
-      styles: ["normal"],
-      formats: ["woff", "ttf"],
+      styles: ['normal'],
+      formats: ['woff', 'ttf']
     }
   ],
   env: {
@@ -86,6 +86,6 @@ export default defineConfig({
     }
   },
   experimental: {
-    svgOptimizer: svgoOptimizer(),
+    svgOptimizer: svgoOptimizer()
   }
 })

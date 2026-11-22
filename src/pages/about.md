@@ -1,6 +1,6 @@
 ---
 layout: ../layouts/AboutLayout.astro
-title: "About"
+title: 'About'
 ---
 
 Brave Alex Studio is a project by me, Danielle M., a software engineer and writer. I've loved RPGs since I was a kid and have been starting to make stuff in the TTRPG space. This is a place to collect my thoughts and share my projects.

@@ -1,12 +1,12 @@
-import type { CollectionEntry } from "astro:content";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import config from "@/config";
-import { resolveTimezone } from "./resolveTimezone";
+import type { CollectionEntry } from 'astro:content'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import config from '@/config'
+import { resolveTimezone } from './resolveTimezone'
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 /**
  * Determines whether a post is eligible to be listed/rendered.
@@ -20,13 +20,13 @@ dayjs.extend(timezone);
  * `pubDatetime` day, not at a time of day. `Datetime.astro` uses the same
  * timezone, so the byline shows that day unless a later `modDatetime` is set.
  */
-export function postFilter({ data }: CollectionEntry<"blog">) {
-  if (data.draft) return false;
-  if (import.meta.env.DEV) return true;
+export function postFilter({ data }: CollectionEntry<'blog'>) {
+  if (data.draft) return false
+  if (import.meta.env.DEV) return true
 
-  const tz = resolveTimezone(data.timezone ?? config.site.timezone);
-  const publishDay = dayjs(data.pubDatetime).tz(tz).startOf("day");
-  const buildDay = dayjs().tz(tz).startOf("day");
+  const tz = resolveTimezone(data.timezone ?? config.site.timezone)
+  const publishDay = dayjs(data.pubDatetime).tz(tz).startOf('day')
+  const buildDay = dayjs().tz(tz).startOf('day')
 
-  return !publishDay.isAfter(buildDay);
+  return !publishDay.isAfter(buildDay)
 }

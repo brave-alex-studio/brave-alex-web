@@ -1,14 +1,14 @@
 ---
-import type { TocItem } from "@/utils/buildTocTree";
+import type { TocItem } from '@/utils/buildTocTree'
 
-type Props = { items: TocItem[] };
+type Props = { items: TocItem[] }
 
-const { items } = Astro.props;
+const { items } = Astro.props
 ---
 
 <ol>
   {
-    items.map(item => (
+    items.map((item) => (
       <li>
         <a href={`#${item.slug}`}>{item.text}</a>
         {item.children.length > 0 && <Astro.self items={item.children} />}

@@ -1,19 +1,19 @@
 @plugin '@tailwindcss/typography';
 
 @utility sans-body {
-  font-family: "Open Sans", sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 1rem;
 }
 
 @layer base {
   .germania-one-regular {
-    font-family: "Germania One", system-ui;
+    font-family: 'Germania One', system-ui;
     font-weight: 400;
     font-style: normal;
   }
 
   body {
-    font-family: "Open Sans", sans-serif;
+    font-family: 'Open Sans', sans-serif;
   }
   /* ===== Override default Tailwind Typography styles ===== */
   .app-prose {
@@ -61,7 +61,7 @@
       @apply mx-auto border border-border;
     }
 
-    img[role="button"] {
+    img[role='button'] {
       @apply cursor-zoom-in;
 
       &:focus-visible {
@@ -83,18 +83,18 @@
         @apply py-1.5;
       }
 
-      th[align="center"],
-      td[align="center"] {
+      th[align='center'],
+      td[align='center'] {
         text-align: center;
       }
 
-      th[align="right"],
-      td[align="right"] {
+      th[align='right'],
+      td[align='right'] {
         text-align: right;
       }
 
-      th[align="left"],
-      td[align="left"] {
+      th[align='left'],
+      td[align='left'] {
         text-align: left;
       }
 
@@ -104,7 +104,7 @@
     }
 
     .table-wrapper {
-      @apply outline-accent my-7 overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dashed;
+      @apply my-7 overflow-x-auto outline-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dashed;
 
       table {
         @apply my-0;
@@ -141,7 +141,7 @@
     @apply flex border bg-(--shiki-light-bg) text-(--shiki-light) outline-border [&_span]:text-(--shiki-light);
   }
 
-  html[data-theme="dark"] .astro-code {
+  html[data-theme='dark'] .astro-code {
     @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
   }
 

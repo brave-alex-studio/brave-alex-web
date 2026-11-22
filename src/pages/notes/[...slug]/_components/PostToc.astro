@@ -1,14 +1,14 @@
 ---
-import type { MarkdownHeading } from "astro";
-import IconArrowNarrowUp from "@/assets/icons/IconArrowNarrowUp.svg";
-import { buildTocTree, hasToc } from "@/utils/buildTocTree";
-import TocList from "./TocList.astro";
+import type { MarkdownHeading } from 'astro'
+import IconArrowNarrowUp from '@/assets/icons/IconArrowNarrowUp.svg'
+import { buildTocTree, hasToc } from '@/utils/buildTocTree'
+import TocList from './TocList.astro'
 
-type Props = { headings: MarkdownHeading[] };
+type Props = { headings: MarkdownHeading[] }
 
-const { headings } = Astro.props;
-const label = "Table of contents";
-const items = buildTocTree(headings);
+const { headings } = Astro.props
+const label = 'Table of contents'
+const items = buildTocTree(headings)
 ---
 
 {
@@ -32,88 +32,80 @@ const items = buildTocTree(headings);
 }
 
 <script>
-  let cleanup: (() => void) | undefined;
+  let cleanup: (() => void) | undefined
 
   function initToc() {
-    cleanup?.();
-    cleanup = undefined;
+    cleanup?.()
+    cleanup = undefined
 
     const links = Array.from(
-      document.querySelectorAll<HTMLAnchorElement>(
-        "[data-toc-nav] a[href^='#']"
-      )
-    );
-    if (!links.length) return;
+      document.querySelectorAll<HTMLAnchorElement>("[data-toc-nav] a[href^='#']")
+    )
+    if (!links.length) return
 
-    const headings = [
-      ...new Set(links.map(link => decodeURIComponent(link.hash.slice(1)))),
-    ]
-      .map(id => document.getElementById(id))
-      .filter(heading => heading !== null);
+    const headings = [...new Set(links.map((link) => decodeURIComponent(link.hash.slice(1))))]
+      .map((id) => document.getElementById(id))
+      .filter((heading) => heading !== null)
 
-    let activeId: string | null = null;
-    let frame = 0;
+    let activeId: string | null = null
+    let frame = 0
 
     // The active section is the last heading that has scrolled above this line.
-    const READING_LINE = 96;
+    const READING_LINE = 96
 
     function update() {
-      frame = 0;
-      const root = document.documentElement;
-      const atBottom = root.scrollTop + innerHeight >= root.scrollHeight - 2;
+      frame = 0
+      const root = document.documentElement
+      const atBottom = root.scrollTop + innerHeight >= root.scrollHeight - 2
 
-      let current: HTMLElement | null = null;
+      let current: HTMLElement | null = null
       for (const heading of headings) {
-        if (heading.getBoundingClientRect().top > READING_LINE) break;
-        current = heading;
+        if (heading.getBoundingClientRect().top > READING_LINE) break
+        current = heading
       }
-      if (atBottom) current = headings[headings.length - 1] ?? current;
+      if (atBottom) current = headings[headings.length - 1] ?? current
 
-      const id = current?.id ?? null;
-      if (id === activeId) return;
-      activeId = id;
+      const id = current?.id ?? null
+      if (id === activeId) return
+      activeId = id
 
       for (const link of links) {
-        const isActive = decodeURIComponent(link.hash.slice(1)) === id;
-        if (isActive) link.setAttribute("aria-current", "true");
-        else link.removeAttribute("aria-current");
+        const isActive = decodeURIComponent(link.hash.slice(1)) === id
+        if (isActive) link.setAttribute('aria-current', 'true')
+        else link.removeAttribute('aria-current')
 
         // Keep the active item in view when the TOC itself scrolls.
-        const list = link.closest<HTMLElement>(
-          ":is(.toc-side, .toc-popover) nav > ol"
-        );
+        const list = link.closest<HTMLElement>(':is(.toc-side, .toc-popover) nav > ol')
         if (isActive && list && list.scrollHeight > list.clientHeight) {
-          const top = link.offsetTop - list.clientHeight / 2;
-          const reduced = matchMedia(
-            "(prefers-reduced-motion: reduce)"
-          ).matches;
-          list.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+          const top = link.offsetTop - list.clientHeight / 2
+          const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+          list.scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' })
         }
       }
     }
 
     const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
+      if (!frame) frame = requestAnimationFrame(update)
+    }
 
-    const backToTop = document.querySelector(".toc-side [data-back-to-top]");
-    const scrollToTop = () => scrollTo(0, 0);
+    const backToTop = document.querySelector('.toc-side [data-back-to-top]')
+    const scrollToTop = () => scrollTo(0, 0)
 
-    backToTop?.addEventListener("click", scrollToTop);
-    addEventListener("scroll", schedule, { passive: true });
-    addEventListener("resize", schedule);
-    update();
+    backToTop?.addEventListener('click', scrollToTop)
+    addEventListener('scroll', schedule, { passive: true })
+    addEventListener('resize', schedule)
+    update()
 
     cleanup = () => {
-      backToTop?.removeEventListener("click", scrollToTop);
-      removeEventListener("scroll", schedule);
-      removeEventListener("resize", schedule);
-      cancelAnimationFrame(frame);
-    };
+      backToTop?.removeEventListener('click', scrollToTop)
+      removeEventListener('scroll', schedule)
+      removeEventListener('resize', schedule)
+      cancelAnimationFrame(frame)
+    }
   }
 
-  document.addEventListener("astro:page-load", initToc);
-  document.addEventListener("astro:before-swap", () => cleanup?.());
+  document.addEventListener('astro:page-load', initToc)
+  document.addEventListener('astro:before-swap', () => cleanup?.())
 </script>
 
 <style is:global>
@@ -146,10 +138,10 @@ const items = buildTocTree(headings);
     transition: color 0.2s ease;
   }
   [data-toc-nav] a:hover,
-  [data-toc-nav] a[aria-current="true"] {
+  [data-toc-nav] a[aria-current='true'] {
     color: var(--color-accent);
   }
-  [data-toc-nav] a[aria-current="true"] {
+  [data-toc-nav] a[aria-current='true'] {
     border-inline-start-color: var(--color-accent);
   }
   .toc-label {
@@ -235,10 +227,7 @@ const items = buildTocTree(headings);
       --toc-gap: clamp(0.75rem, calc(var(--toc-space) - 14.5rem), 2.5rem);
       --toc-edge: clamp(0.75rem, calc(var(--toc-space) - 15.5rem), 1.5rem);
       margin-inline-start: var(--toc-gap);
-      width: min(
-        16rem,
-        calc(var(--toc-space) - var(--toc-gap) - var(--toc-edge))
-      );
+      width: min(16rem, calc(var(--toc-space) - var(--toc-gap) - var(--toc-edge)));
       container-type: inline-size;
     }
     /* Too narrow to read, so the floating button takes over. */

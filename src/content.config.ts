@@ -1,8 +1,7 @@
 import { defineCollection } from 'astro:content'
-import { z } from "astro/zod";
+import { z } from 'astro/zod'
 import { glob } from 'astro/loaders'
-// import { SITE } from '@/config'
-import config from "@/config";
+import config from '@/config'
 
 export const BLOG_PATH = 'src/data/blog'
 export const WORK_PATH = 'src/data/work'
@@ -27,19 +26,19 @@ const blog = defineCollection({
       timezone: z
         .string()
         .optional()
-        .transform(tz => tz || undefined)
+        .transform((tz) => tz || undefined)
     })
 })
 
-const pages = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/pages" }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    ogImage: z.string().optional(),
-    canonicalURL: z.string().optional(),
-  }),
-});
+// const pages = defineCollection({
+//   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/pages" }),
+//   schema: z.object({
+//     title: z.string(),
+//     description: z.string().optional(),
+//     ogImage: z.string().optional(),
+//     canonicalURL: z.string().optional(),
+//   }),
+// });
 
 const work = defineCollection({
   loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: `./${WORK_PATH}` }),
@@ -54,4 +53,4 @@ const work = defineCollection({
     })
 })
 
-export const collections = { blog, work, pages }
+export const collections = { blog, work }

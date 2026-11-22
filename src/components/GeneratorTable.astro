@@ -1,23 +1,15 @@
 ---
 type Props = {
-  id?: string;
-  dice: string;
-  mode?: "single" | "multi";
-  headers: string[];
-  rows: (string | number)[][];
-  caption?: string;
-  pinFirstColumn?: boolean;
-};
+  id?: string
+  dice: string
+  mode?: 'single' | 'multi'
+  headers: string[]
+  rows: (string | number)[][]
+  caption?: string
+  pinFirstColumn?: boolean
+}
 
-const {
-  id,
-  dice,
-  mode = "single",
-  headers,
-  rows,
-  caption,
-  pinFirstColumn = true,
-} = Astro.props;
+const { id, dice, mode = 'single', headers, rows, caption, pinFirstColumn = true } = Astro.props
 ---
 
 <div class="ttrpg-wrapper" id={id ? `${id}-wrapper` : undefined}>
@@ -28,37 +20,27 @@ const {
     data-headers={JSON.stringify(headers)}
     id={id}
   >
-    {
-      caption && (
-        <caption class="my-2 text-sm text-foreground/70 italic">
-          {caption}
-        </caption>
-      )
-    }
+    {caption && <caption class="my-2 text-sm text-foreground/70 italic">{caption}</caption>}
     <thead>
       <tr>
-        <th class:list={["ttrpg-die-col", { "pinned-col": pinFirstColumn }]}>
+        <th class:list={['ttrpg-die-col', { 'pinned-col': pinFirstColumn }]}>
           {dice}
         </th>
-        {headers.map(h => <th>{h}</th>)}
+        {headers.map((h) => <th>{h}</th>)}
       </tr>
     </thead>
     <tbody>
       {
-        rows.map(row => {
-          const [result, ...values] = row;
+        rows.map((row) => {
+          const [result, ...values] = row
           return (
             <tr data-result={String(result)}>
-              <td
-                class:list={["ttrpg-die-col", { "pinned-col": pinFirstColumn }]}
-              >
-                {result}
-              </td>
-              {values.map(v => (
+              <td class:list={['ttrpg-die-col', { 'pinned-col': pinFirstColumn }]}>{result}</td>
+              {values.map((v) => (
                 <td>{v}</td>
               ))}
             </tr>
-          );
+          )
         })
       }
     </tbody>
