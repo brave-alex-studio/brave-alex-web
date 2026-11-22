@@ -32,7 +32,7 @@
     "@astrojs/check": "^0.9.12",
     "@pagefind/default-ui": "^1.6.0",
     "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/git": "^11.0.1",
     "@semantic-release/github": "^12.0.11",
     "@semantic-release/npm": "^13.2.0",
     "@semantic-release/release-notes-generator": "^14.1.1",
@@ -47,8 +47,8 @@
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "semantic-release": "^25.0.3",
-    "typescript": "^6.0.3",
+    "semantic-release": "^26.0.1",
+    "typescript": "^7.0.2",
     "typescript-eslint": "^8.73.0"
   }
 }
