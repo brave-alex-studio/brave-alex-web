@@ -1,5 +1,4 @@
 ---
-import Hr from './Hr.astro'
 import IconX from '@/assets/icons/IconX.svg'
 import IconMoon from '@/assets/icons/IconMoon.svg'
 import IconSearch from '@/assets/icons/IconSearch.svg'
@@ -7,15 +6,10 @@ import IconArchive from '@/assets/icons/IconArchive.svg'
 import IconSunHigh from '@/assets/icons/IconSunHigh.svg'
 import IconMenuDeep from '@/assets/icons/IconMenuDeep.svg'
 import LinkButton from './LinkButton.astro'
-import { stripBase } from '@/utils/withBase'
 import config from '@/config'
 
 const { site, features } = config
 const { pathname } = Astro.url
-
-const relativePath = stripBase(Astro.url.pathname)
-const pathWithoutTrailingSlash =
-  relativePath.endsWith('/') && relativePath !== '/' ? relativePath.slice(0, -1) : relativePath
 
 // Remove trailing slash from current pathname if exists
 const currentPath = pathname.endsWith('/') && pathname !== '/' ? pathname.slice(0, -1) : pathname
