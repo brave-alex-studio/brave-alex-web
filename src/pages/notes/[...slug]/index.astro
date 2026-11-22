@@ -61,7 +61,6 @@ type Props = {
 }
 
 const { post, prevPost, nextPost } = Astro.props
-const locale = Astro.currentLocale ?? config.site.lang
 
 const {
   title,
@@ -72,7 +71,6 @@ const {
   modDatetime,
   timezone,
   tags,
-  hideEditPost,
   hideToc
 } = post.data
 
@@ -88,7 +86,7 @@ if (typeof initOgImage === 'string') {
 }
 
 if (!ogImageUrl && config.features.dynamicOgImage) {
-  const postUrl = getPostUrl(post.id, post.filePath, locale).replace(/\/+$/, '')
+  const postUrl = getPostUrl(post.id, post.filePath).replace(/\/+$/, '')
   ogImageUrl = `${postUrl}/index.png`
 }
 

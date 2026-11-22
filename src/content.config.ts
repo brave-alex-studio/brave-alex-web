@@ -48,7 +48,7 @@ const work = defineCollection({
       name: z.string(),
       description: z.string(),
       date: z.date(),
-      url: z.string().url().optional(),
+      url: z.url().optional(),
       image: image(),
       tags: z.array(z.string()).default([])
     })

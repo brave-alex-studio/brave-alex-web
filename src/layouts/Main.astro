@@ -5,10 +5,9 @@ import config from '@/config'
 type Props = {
   pageTitle: string | [string, string]
   pageDesc?: string
-  class?: string
 }
 
-const { pageTitle, pageDesc, class: className } = Astro.props
+const { pageTitle, pageDesc } = Astro.props
 
 const backUrl = config.features.showBackButton ? Astro.url.pathname : '/'
 ---
