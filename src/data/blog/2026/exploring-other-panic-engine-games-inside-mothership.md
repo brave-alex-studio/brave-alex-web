@@ -19,8 +19,6 @@ I'm pretty sure I am not the first person to come up with this idea, but I wante
 
 SPOILER ALERT: Small spoilers ahead for [_The Unseen City_](https://chrisair.itch.io/the-unseen-city-biome) module for Cloud Empress.
 
-## Table of contents
-
 ## What is a holodeck episode?
 
 [Trekkies, you probably know what this is and can skip ahead.]

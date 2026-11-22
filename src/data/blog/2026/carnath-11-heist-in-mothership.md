@@ -16,8 +16,6 @@ After my players escaped Prison Station Echo (seriously, go get this [module+san
 
 SPOILER ALERT: Light spoilers for some of the _Cleaning of Prison Station Echo_ content ahead.
 
-## Table of contents
-
 ## The hook and a bit of context
 
 At the prison, the players were able to take the AI core for themselves. They escaped before the military cleaning crew got to the prison and made it back to Carnath. They brought Susan and Jimmy along for the ride (and these NPCs are now part of the crew). They weren't about to hand the AI over to TeraTek. They successfully rolled to have AI Echo transmit fake data to TeraTek and to hopefully buy time before anyone (other than XeroCorp) found out what had happened at the prison.
