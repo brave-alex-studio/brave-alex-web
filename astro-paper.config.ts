@@ -25,6 +25,7 @@ export default defineAstroPaperConfig({
       enabled: false,
     },
     search: "pagefind",
+    toc: true,
   },
   socials: [
     { name: "github",   url: "https://github.com/brave-alex-studio" },

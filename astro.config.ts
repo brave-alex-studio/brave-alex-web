@@ -2,8 +2,7 @@ import { defineConfig, envField, fontProviders, svgoOptimizer } from 'astro/conf
 import mdx from '@astrojs/mdx'
 import tailwindcss from '@tailwindcss/vite'
 import sitemap from '@astrojs/sitemap'
-import remarkToc from 'remark-toc'
-import remarkCollapse from 'remark-collapse'
+import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark'
 import rehypeCallouts from 'rehype-callouts'
 import {
   transformerNotationDiff,
@@ -12,6 +11,7 @@ import {
 } from '@shikijs/transformers'
 import { transformerFileName } from './src/utils/transformers/fileName'
 import { rehypeTableWrapper } from './src/utils/rehypeTableWrapper'
+import { inlineTocDeprecation, rehypeInlineToc } from './src/utils/rehypeInlineToc'
 import config from './astro-paper.config'
 
 export default defineConfig({
@@ -20,11 +20,13 @@ export default defineConfig({
     sitemap({
       filter: (page) => config.features?.showArchives !== false || !/\/archives\/?$/.test(page)
     }),
-    mdx()
+    mdx(),
+    inlineTocDeprecation()
   ],
   markdown: {
-    remarkPlugins: [remarkToc, [remarkCollapse, { test: 'Table of contents' }]],
-    rehypePlugins: [rehypeCallouts, rehypeTableWrapper],
+    processor: unified({
+      rehypePlugins: [rehypeHeadingIds, rehypeInlineToc, rehypeCallouts, rehypeTableWrapper]
+    }),
     shikiConfig: {
       // For more themes, visit https://shiki.style/themes
       themes: { light: 'min-light', dark: 'night-owl' },

@@ -16,8 +16,6 @@ In case my setup will be useful to anyone else, I decided to write a little bit 
 
 MINOR SPOILER ALERTS: I do talk about a few of the modules I have used and there could be tiny spoilers for players. I won't go into too much detail, but be aware.
 
-## Table of contents
-
 ## The overarching frame
 
 In order to account for the possibility of character deaths and players not always being about to make it to a session, I decided that the characters work as privateers whose ship has a lien on it by my custom megacorporation, TRG Corporation, which operates mostly in Core space.
