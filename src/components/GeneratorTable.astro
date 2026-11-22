@@ -23,26 +23,24 @@ const { id, dice, mode = 'single', headers, rows, caption, pinFirstColumn = true
     {caption && <caption class="my-2 text-sm text-foreground/70 italic">{caption}</caption>}
     <thead>
       <tr>
-        <th class:list={['ttrpg-die-col', { 'pinned-col': pinFirstColumn }]}>
-          {dice}
-        </th>
-        {headers.map((h) => <th>{h}</th>)}
+        <th class:list={['ttrpg-die-col', { 'pinned-col': pinFirstColumn }]}>{dice}</th>
+        {headers.map((h) => (
+          <th>{h}</th>
+        ))}
       </tr>
     </thead>
     <tbody>
-      {
-        rows.map((row) => {
-          const [result, ...values] = row
-          return (
-            <tr data-result={String(result)}>
-              <td class:list={['ttrpg-die-col', { 'pinned-col': pinFirstColumn }]}>{result}</td>
-              {values.map((v) => (
-                <td>{v}</td>
-              ))}
-            </tr>
-          )
-        })
-      }
+      {rows.map((row) => {
+        const [result, ...values] = row
+        return (
+          <tr data-result={String(result)}>
+            <td class:list={['ttrpg-die-col', { 'pinned-col': pinFirstColumn }]}>{result}</td>
+            {values.map((v) => (
+              <td>{v}</td>
+            ))}
+          </tr>
+        )
+      })}
     </tbody>
   </table>
 </div>

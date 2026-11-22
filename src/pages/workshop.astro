@@ -22,15 +22,13 @@ const sortedWorks = getSortedWork(works)
       </h1>
       <p class="text-lg">All of the things I have made are collected on this page.</p>
       <div class="grid-cols-2 gap-8 sm:grid">
-        {
-          sortedWorks.length > 0 && (
-            <>
-              {sortedWorks.map((data) => (
-                <WorkCard {...data} />
-              ))}
-            </>
-          )
-        }
+        {sortedWorks.length > 0 && (
+          <>
+            {sortedWorks.map((data) => (
+              <WorkCard {...data} />
+            ))}
+          </>
+        )}
       </div>
     </section>
   </main>

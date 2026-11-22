@@ -22,9 +22,7 @@ const { title, description, ...props } = data
       'focus-visible:no-underline focus-visible:underline-offset-0'
     ]}
   >
-    <Heading style={{ viewTransitionName: toTransitionName(id) }}>
-      {title}
-    </Heading>
+    <Heading style={{ viewTransitionName: toTransitionName(id) }}>{title}</Heading>
   </a>
   <Datetime {...props} />
   <p class="text-lg">{description}</p>
